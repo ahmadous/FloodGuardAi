@@ -1,0 +1,9 @@
+# Ignore lourd modèles/artefacts produits localement
+*.pkl
+*.pth
+*.joblib
+
+# Autoriser les métadonnées JSON nécessaires
+!flood_model_metadata.json
+!flood_predict_metadata.json
+!geodata_manifest.json

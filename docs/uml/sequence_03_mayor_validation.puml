@@ -1,0 +1,98 @@
+@startuml Séquence 3 - Maire valide une alerte
+
+actor "Maire\n(Local Admin)" as Mayor
+participant "Frontend\n(Vue.js)" as Frontend
+participant "Firebase\nAuth" as FirebaseAuth
+participant "Firebase\nFirestore" as Firestore
+participant "API Gateway" as Gateway
+participant "Notification\nService" as NotifService
+
+title Scénario: Un maire consulte et valide une alerte de sa zone
+
+== Authentification et vérification du rôle ==
+Mayor -> Frontend: Accède dashboard maire
+Frontend -> FirebaseAuth: getCurrentUser()
+
+alt Utilisateur authentifié
+    FirebaseAuth --> Frontend: User(uid, email)
+    Frontend -> Firestore: getDoc('userRoles', uid)
+    Firestore --> Frontend: {role: 'local_admin',\nzone: 'Dakar'}
+
+    alt Rôle = local_admin
+        Frontend -> Frontend: Autorise accès\nau dashboard maire
+
+        == Consultation des alertes ==
+        Mayor -> Frontend: Ouvre "Alertes en attente"
+        Frontend -> Firestore: query('alerts')\n.where('zone', '==', 'Dakar')\n.where('status', '==', 'pending')\n.orderBy('createdAt', 'desc')
+        Firestore --> Frontend: Liste des alertes [12 alertes]
+        Frontend --> Mayor: Affiche liste avec:\n- Localisation\n- Classification IA\n- Photos\n- Description
+
+        == Consultation détail d'une alerte ==
+        Mayor -> Frontend: Clique sur alerte ALT-12345
+        Frontend -> Firestore: getDoc('alerts', 'ALT-12345')
+        Firestore --> Frontend: Alert details
+        Frontend -> Gateway: GET /geo/features?\nlat=14.6937&lon=-17.4441\n&region=dakar
+        Gateway --> Frontend: Geo context enrichi
+        Frontend -> Frontend: Affiche carte Leaflet\navec marker
+        Frontend --> Mayor: Vue détaillée:\n- Photos (galerie)\n- Carte interactive\n- Classification: flooded (87%)\n- Distance cours d'eau: 245m\n- Zone inondable: Oui
+
+        == Validation de l'alerte ==
+        Mayor -> Frontend: Clique "Valider l'alerte"
+        Frontend -> Frontend: Affiche dialogue\nconfirmation + sévérité
+        Mayor -> Frontend: Sélectionne sévérité: "HIGH"\nCommentaire: "Zone prioritaire"
+
+        Frontend -> Firestore: updateDoc('alerts', 'ALT-12345', {\n  status: 'verified',\n  severity: 'high',\n  validatedBy: mayor_uid,\n  validatedAt: now,\n  validationComment: "...",\n  updatedAt: now\n})
+
+        alt Mise à jour réussie
+            Firestore --> Frontend: Update success
+
+            == Notification du citoyen ==
+            opt Notification activée
+                Frontend -> NotifService: sendNotification({\n  userId: citizen_uid,\n  type: 'alert_validated',\n  alertId: 'ALT-12345',\n  message: "Votre alerte a été validée"\n})
+                NotifService -> Firestore: createDoc('notifications', {...})
+                Firestore --> NotifService: Notification created
+                NotifService --> Frontend: Notification sent
+            end
+
+            Frontend --> Mayor: ✓ Alerte validée et citoyen notifié
+
+            == Mise à jour statistiques dashboard ==
+            Frontend -> Firestore: query('alerts')\n.where('zone', '==', 'Dakar')\n.where('status', '==', 'verified')
+            Firestore --> Frontend: Stats updated
+            Frontend -> Frontend: Rafraîchit dashboard:\n- Alertes validées: 45\n- En attente: 11\n- Zones critiques: 3
+
+        else Erreur de mise à jour
+            Firestore --> Frontend: Error
+            Frontend --> Mayor: ❌ Erreur lors de la validation
+        end
+
+    else Rôle insuffisant
+        Frontend --> Mayor: ❌ Accès refusé
+    end
+
+else Non authentifié
+    FirebaseAuth --> Frontend: Not authenticated
+    Frontend --> Mayor: ↪ Redirection /login
+end
+
+note right of Firestore
+  Seules les alertes de la zone
+  du maire sont accessibles.
+  Filtre automatique par zone.
+end note
+
+note right of Mayor
+  Le maire peut:
+  - Valider (verified)
+  - Rejeter (rejected)
+  - Demander infos (pending)
+  - Marquer résolue (resolved)
+end note
+
+note right of NotifService
+  Notification temps réel
+  via Firebase Cloud Messaging
+  ou notification in-app
+end note
+
+@enduml

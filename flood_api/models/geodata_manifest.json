@@ -1,0 +1,221 @@
+{
+  "regions": {
+    "dakar": {
+      "region": "dakar",
+      "geopackage": "flood_api/models/geodata/dakar.gpkg",
+      "layers": [
+        {
+          "name": "Axe_ecoulement_temporaire",
+          "feature_count": 161,
+          "geometry_type": [
+            "LineString"
+          ],
+          "bounds": [
+            -17.51991233916722,
+            14.653497213407153,
+            -17.298466831134842,
+            14.804634810127055
+          ]
+        },
+        {
+          "name": "Bassin",
+          "feature_count": 874,
+          "geometry_type": [
+            "Polygon",
+            "MultiPolygon"
+          ],
+          "bounds": [
+            -17.521704181458716,
+            14.665867664342946,
+            -17.298416541699996,
+            14.804865877207726
+          ]
+        },
+        {
+          "name": "Eau_permanente_fermee",
+          "feature_count": 454,
+          "geometry_type": [
+            "Polygon",
+            "MultiPolygon"
+          ],
+          "bounds": [
+            -17.527575668536468,
+            14.721340279086832,
+            -17.303488260105894,
+            14.804271074547804
+          ]
+        },
+        {
+          "name": "Eau_permanente_ouverte",
+          "feature_count": 211,
+          "geometry_type": [
+            "LineString"
+          ],
+          "bounds": [
+            -17.519157171834586,
+            14.678649120661378,
+            -17.299081061309767,
+            14.79726613564107
+          ]
+        },
+        {
+          "name": "Zone_inondable_humide",
+          "feature_count": 571,
+          "geometry_type": [
+            "Polygon",
+            "MultiPolygon"
+          ],
+          "bounds": [
+            -17.5202518006712,
+            14.69859329166128,
+            -17.299445921626653,
+            14.80294012444352
+          ]
+        }
+      ]
+    },
+    "kaolack": {
+      "region": "kaolack",
+      "geopackage": "flood_api/models/geodata/kaolack.gpkg",
+      "layers": [
+        {
+          "name": "Axe_ecoulement_temporaire",
+          "feature_count": 127,
+          "geometry_type": [
+            "LineString"
+          ],
+          "bounds": [
+            -16.120014608805977,
+            14.127569211008419,
+            -16.027543571514766,
+            14.17776570417775
+          ]
+        },
+        {
+          "name": "Bassin",
+          "feature_count": 173,
+          "geometry_type": [
+            "Polygon"
+          ],
+          "bounds": [
+            -16.10166448465673,
+            14.130516688684988,
+            -16.028373773741126,
+            14.18616762913744
+          ]
+        },
+        {
+          "name": "Eau_permanente_fermee",
+          "feature_count": 7,
+          "geometry_type": [
+            "Polygon"
+          ],
+          "bounds": [
+            -16.09518767460911,
+            14.13888693312579,
+            -16.030234698757937,
+            14.178438222399093
+          ]
+        },
+        {
+          "name": "Eau_permanente_ouverte",
+          "feature_count": 44,
+          "geometry_type": [
+            "LineString"
+          ],
+          "bounds": [
+            -16.116110775894573,
+            14.11674264990557,
+            -16.026342537973495,
+            14.177414285901868
+          ]
+        },
+        {
+          "name": "Zone_inondable_humide",
+          "feature_count": 190,
+          "geometry_type": [
+            "Polygon"
+          ],
+          "bounds": [
+            -16.119045613855594,
+            14.11435374450591,
+            -16.028182335644193,
+            14.183597445958691
+          ]
+        }
+      ]
+    },
+    "saintlouis": {
+      "region": "saintlouis",
+      "geopackage": "flood_api/models/geodata/saintlouis.gpkg",
+      "layers": [
+        {
+          "name": "Axe_ecoulement_temporaire",
+          "feature_count": 42,
+          "geometry_type": [
+            "LineString"
+          ],
+          "bounds": [
+            -16.49601274716536,
+            15.975533535748871,
+            -16.46319574972833,
+            16.05997628620577
+          ]
+        },
+        {
+          "name": "Bassin",
+          "feature_count": 265,
+          "geometry_type": [
+            "Polygon"
+          ],
+          "bounds": [
+            -16.508715561336174,
+            15.979411350396806,
+            -16.447554034151693,
+            16.068304053987685
+          ]
+        },
+        {
+          "name": "Eau_permanente_fermee",
+          "feature_count": 16,
+          "geometry_type": [
+            "Polygon"
+          ],
+          "bounds": [
+            -16.493788606192595,
+            15.98590199652023,
+            -16.447149072151397,
+            16.06619406120187
+          ]
+        },
+        {
+          "name": "Eau_permanente_ouverte",
+          "feature_count": 12,
+          "geometry_type": [
+            "LineString"
+          ],
+          "bounds": [
+            -16.499136471933365,
+            16.010826069780613,
+            -16.444772151494284,
+            16.07313774735664
+          ]
+        },
+        {
+          "name": "Zone_inondable_humide",
+          "feature_count": 76,
+          "geometry_type": [
+            "Polygon",
+            "MultiPolygon"
+          ],
+          "bounds": [
+            -16.50911231782603,
+            15.97471940112662,
+            -16.443850297950544,
+            16.072619434711726
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,99 @@
+@startuml Séquence 4 - Prédiction par lot (Batch)
+
+actor "Super Admin" as Admin
+participant "Frontend\n(Vue.js)" as Frontend
+participant "API Gateway" as Gateway
+participant "Forecast\nService" as ForecastSvc
+participant "Forecast\nEngine" as Engine
+participant "Random Forest\nModel" as RFModel
+participant "Scaler" as Scaler
+
+title Scénario: Super Admin lance prédiction batch pour analyse de scénarios
+
+== Préparation des données ==
+Admin -> Frontend: Accède "Analyse par lot"
+Admin -> Frontend: Charge fichier CSV\nou remplit tableau manuel
+
+Frontend -> Frontend: Parse données:\n[\n  {precip: 45, humidity: 85, temp: 28, ...},\n  {precip: 120, humidity: 92, temp: 26, ...},\n  {precip: 30, humidity: 75, temp: 30, ...},\n  ... (50 scénarios)\n]
+
+== Envoi requête batch ==
+Admin -> Frontend: Clique "Analyser tous les scénarios"
+Frontend -> Gateway: POST /predict_meteo_batch\n{\n  samples: [\n    {precipitation, humidity, temp,\n     lat, lon, region, ...},\n    ...\n  ]\n}
+Gateway -> ForecastSvc: Forward batch request
+
+== Traitement en boucle ==
+ForecastSvc -> ForecastSvc: results = []
+
+loop Pour chaque échantillon (50×)
+
+    ForecastSvc -> ForecastSvc: Valide données:\n_require_float(precip)\n_require_float(humidity)\n_require_float(temp)
+
+    alt Données valides
+
+        ForecastSvc -> Engine: build_feature_vector(\n  precipitation_sum,\n  humidity_mean,\n  temperature_mean,\n  precip_3d_sum?,\n  precip_7d_sum?,\n  precip_15d_sum?\n)
+        Engine --> ForecastSvc: feature_vector (9 features)
+
+        ForecastSvc -> Engine: predict_from_features(\n  feature_vector,\n  rf_model,\n  scaler\n)
+        Engine -> Scaler: transform(features)
+        Scaler --> Engine: scaled_features
+        Engine -> RFModel: predict_proba(scaled)
+        RFModel --> Engine: probabilities
+        Engine -> Engine: Apply threshold (0.35)
+        Engine --> ForecastSvc: PredictionResult(\n  prediction: 1,\n  proba_inondation: 0.68\n)
+
+        ForecastSvc -> ForecastSvc: compute_geo_context(\n  lat, lon, region\n)
+
+        ForecastSvc -> ForecastSvc: results.append({\n  precipitation,\n  humidity,\n  temperature,\n  precip_3d_sum,\n  precip_7d_sum,\n  precip_15d_sum,\n  prediction: 1,\n  proba_inondation: 0.68,\n  inondation: true,\n  geo_context: {...},\n  features: {...}\n})
+
+    else Données invalides
+        ForecastSvc -> ForecastSvc: results.append({\n  error: "Champ 'precipitation' invalide",\n  input: {...}\n})
+    end
+
+end
+
+== Retour des résultats ==
+ForecastSvc --> Gateway: {\n  results: [50 prédictions]\n}
+Gateway --> Frontend: Batch results
+
+== Visualisation et analyse ==
+Frontend -> Frontend: Génère tableau récapitulatif
+Frontend -> Frontend: Crée graphiques:\n- Histogramme probabilités\n- Scatter plot precip/risque\n- Heatmap par zone
+
+Frontend -> Frontend: Calcule statistiques:\n- Taux inondation: 34/50 (68%)\n- Proba moyenne: 0.54\n- Scénarios critiques: 12
+
+Frontend --> Admin: 📊 Résultats batch:\n- 50 scénarios analysés\n- 34 risques d'inondation détectés\n- 16 pas de risque\n- 0 erreur\n\n[Télécharger CSV] [Exporter rapport]
+
+== Export des résultats ==
+Admin -> Frontend: Clique "Exporter rapport"
+Frontend -> Frontend: Génère CSV/Excel avec:\n- Tous les paramètres\n- Prédictions\n- Probabilités\n- Contexte géo
+
+Frontend --> Admin: 📥 Télécharge\n"batch_predictions_2025-10-13.csv"
+
+note right of ForecastSvc
+  Traitement robuste:
+  - Continue si erreur sur un sample
+  - Capture exceptions par sample
+  - Retourne résultats + erreurs
+end note
+
+note right of Admin
+  Cas d'usage batch:
+  - Tests de scénarios
+  - Analyse sensibilité
+  - Planification urbanisme
+  - Études d'impact
+  - Rapports gouvernementaux
+end note
+
+note bottom of Engine
+  Features minimales requises:
+  - precipitation (obligatoire)
+  - humidity (obligatoire)
+  - temperature (obligatoire)
+
+  Features optionnelles:
+  - precip_3d/7d/15d_sum
+  - lat/lon pour geo_context
+end note
+
+@enduml

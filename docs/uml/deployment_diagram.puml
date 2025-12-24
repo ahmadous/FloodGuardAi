@@ -1,0 +1,219 @@
+@startuml Diagramme de Déploiement - Architecture Système
+
+!define DOCKER_COLOR #E3F2FD
+!define CLOUD_COLOR #FFF3E0
+!define DB_COLOR #F3E5F5
+
+title Architecture Générale - Système de Détection d'Inondations au Sénégal
+
+' ============================================
+' INFRASTRUCTURE CLIENT
+' ============================================
+
+node "Navigateur Web" as Browser {
+    component [Frontend\nVue.js 3 + Vite] as Frontend
+    component [Leaflet\n(Cartographie)] as Leaflet
+    component [Chart.js\n(Graphiques)] as ChartJS
+
+    Frontend --> Leaflet
+    Frontend --> ChartJS
+}
+
+' ============================================
+' CLOUD - FIREBASE
+' ============================================
+
+cloud "Firebase\n(Google Cloud)" as Firebase CLOUD_COLOR {
+    database "Firestore\n(NoSQL)" as Firestore DB_COLOR {
+        folder "Collections" {
+            component [users] as UsersCol
+            component [alerts] as AlertsCol
+            component [userRoles] as RolesCol
+            component [notifications] as NotifCol
+        }
+    }
+
+    component [Firebase Auth] as FirebaseAuth
+    component [Firebase Storage\n(Images)] as FirebaseStorage
+    component [Firebase Hosting] as FirebaseHosting
+}
+
+' ============================================
+' SERVEUR DOCKER
+' ============================================
+
+node "Serveur Docker\n(Linux)" as DockerHost {
+
+    ' Container API Gateway
+    node "Container: API Gateway" as GatewayContainer DOCKER_COLOR {
+        component [Flask App\nPort 5000] as APIGateway
+        component [GeoBlueprint\n/geo/*] as GeoAPI
+
+        APIGateway --> GeoAPI
+    }
+
+    ' Container Classification Service
+    node "Container: Classification Service" as ClassifContainer DOCKER_COLOR {
+        component [Flask App\nPort 5001] as ClassifService
+        component [PyTorch\nResNet18] as ResNet
+        component [Model Registry] as ModelReg1
+
+        ClassifService --> ResNet
+        ClassifService --> ModelReg1
+    }
+
+    ' Container Forecast Service
+    node "Container: Forecast Service" as ForecastContainer DOCKER_COLOR {
+        component [Flask App\nPort 5002] as ForecastService
+        component [Random Forest\nModel] as RFModel
+        component [Forecast Engine] as ForecastEngine
+        component [Model Registry] as ModelReg2
+
+        ForecastService --> RFModel
+        ForecastService --> ForecastEngine
+        ForecastService --> ModelReg2
+    }
+
+    ' Container Frontend (Optionnel en prod)
+    node "Container: Frontend" as FrontendContainer DOCKER_COLOR {
+        component [Nginx\nPort 5173] as Nginx
+        component [Static Files\n(dist)] as StaticFiles
+
+        Nginx --> StaticFiles
+    }
+
+    ' Volume partagé
+    database "Volume Docker\n/models" as ModelsVolume DB_COLOR {
+        file "best_flood_classifier.pth"
+        file "random_forest_predict_model.pkl"
+        file "scaler_predict.pkl"
+        file "flood_predict_metadata.json"
+        folder "geodata/" {
+            file "dakar.gpkg"
+            file "saintlouis.gpkg"
+            file "kaolack.gpkg"
+        }
+    }
+}
+
+' ============================================
+' API EXTERNE
+' ============================================
+
+cloud "Open-Meteo API\n(Données Météo)" as OpenMeteo CLOUD_COLOR {
+    component [API REST\nPrévisions 5 jours] as MeteoAPI
+}
+
+' ============================================
+' RELATIONS CLIENT → BACKEND
+' ============================================
+
+Browser --> FirebaseAuth : Authentification
+Browser --> Firestore : CRUD Alertes/Users
+Browser --> FirebaseStorage : Upload/Download Images
+Browser --> APIGateway : HTTP/REST\nPort 5000
+
+FirebaseHosting --> StaticFiles : Hébergement\n(Production)
+
+' ============================================
+' RELATIONS BACKEND
+' ============================================
+
+APIGateway --> ClassifService : Proxy\nHTTP Port 5001
+APIGateway --> ForecastService : Proxy\nHTTP Port 5002
+
+ForecastService --> OpenMeteo : GET Forecast Data\nHTTPS
+ForecastService --> MeteoAPI
+
+ClassifService --> ModelsVolume : Charge modèles ML
+ForecastService --> ModelsVolume : Charge modèles ML
+GeoAPI --> ModelsVolume : Charge geodata
+
+' ============================================
+' LÉGENDE ET NOTES
+' ============================================
+
+note right of Browser
+  <b>Clients:</b>
+  • Citoyens (créer alertes)
+  • Maires (valider alertes)
+  • Super Admins (administration)
+
+  <b>Accès:</b>
+  Via navigateur web
+  (Chrome, Firefox, Safari)
+end note
+
+note right of DockerHost
+  <b>Docker Compose:</b>
+  4 conteneurs orchestrés
+
+  <b>Réseau:</b>
+  • API Gateway: 5000
+  • Classification: 5001
+  • Forecast: 5002
+  • Frontend: 5173
+
+  <b>Volumes:</b>
+  • /models (partagé)
+end note
+
+note bottom of Firebase
+  <b>Firebase Services:</b>
+  • Auth: Gestion utilisateurs
+  • Firestore: Base de données temps réel
+  • Storage: Stockage images
+  • Hosting: Hébergement frontend (prod)
+
+  <b>Sécurité:</b>
+  Rules Firestore par zone/rôle
+end note
+
+note right of ModelsVolume
+  <b>Modèles ML:</b>
+  • ResNet18 (16 MB)
+  • Random Forest (2 MB)
+  • Scaler (100 KB)
+
+  <b>Données Géo:</b>
+  • Dakar: 5 layers
+  • Saint-Louis: 5 layers
+  • Kaolack: 5 layers
+end note
+
+note bottom of OpenMeteo
+  <b>API Météo Gratuite:</b>
+  • Prévisions 5 jours
+  • Données horaires
+  • Variables: temp, précip, humidité
+
+  <b>Zones couvertes:</b>
+  Dakar, Saint-Louis, Kaolack,
+  Kolda, Tambacounda, Touba
+end note
+
+' ============================================
+' LÉGENDE DES PROTOCOLES
+' ============================================
+
+legend right
+  <b>Protocoles de communication:</b>
+  • HTTP/REST : Communication API
+  • HTTPS : Communication sécurisée
+  • WebSocket : Temps réel (Firestore)
+
+  <b>Ports réseau:</b>
+  • 5000 : API Gateway
+  • 5001 : Classification Service
+  • 5002 : Forecast Service
+  • 5173 : Frontend (dev)
+
+  <b>Technologies:</b>
+  • Backend : Python + Flask
+  • Frontend : Vue.js 3 + Vite
+  • ML : PyTorch + scikit-learn
+  • Container : Docker + Docker Compose
+  • Cloud : Firebase (Google Cloud)
+end legend
+
+@enduml

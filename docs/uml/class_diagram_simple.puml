@@ -1,0 +1,210 @@
+@startuml Diagramme de Classes - Entités Principales
+
+title Diagramme de Classes - Entités du Domaine
+
+' ============================================
+' ENTITÉS PRINCIPALES
+' ============================================
+
+class User {
+    - uid: string
+    - email: string
+    - phoneNumber: string
+    - displayName: string
+    - zone: string
+    - createdAt: Timestamp
+    --
+    + register(): void
+    + updateProfile(): void
+    + delete(): void
+}
+
+class UserRole {
+    - userId: string
+    - role: string
+    - zone: string
+    - permissions: List<string>
+    --
+    + hasPermission(action): boolean
+    + canAccessZone(zone): boolean
+}
+
+class Alert {
+    - id: string
+    - userId: string
+    - description: string
+    - location: GeoPoint
+    - zone: string
+    - status: string
+    - severity: string
+    - createdAt: Timestamp
+    - updatedAt: Timestamp
+    - validatedAt: Timestamp
+    - validatedBy: string
+    --
+    + create(): void
+    + update(): void
+    + validate(): void
+    + reject(): void
+    + resolve(): void
+}
+
+class AlertImage {
+    - id: string
+    - alertId: string
+    - imageUrl: string
+    - classification: string
+    - probability: float
+    - uploadedAt: Timestamp
+    --
+    + upload(): void
+    + classify(): void
+    + delete(): void
+}
+
+class AlertValidation {
+    - id: string
+    - alertId: string
+    - validatorId: string
+    - action: string
+    - comment: string
+    - severity: string
+    - validatedAt: Timestamp
+    --
+    + create(): void
+    + getHistory(): List<AlertValidation>
+}
+
+class Notification {
+    - id: string
+    - userId: string
+    - alertId: string
+    - type: string
+    - message: string
+    - read: boolean
+    - createdAt: Timestamp
+    --
+    + send(): void
+    + markAsRead(): void
+    + delete(): void
+}
+
+class WeatherPrediction {
+    - id: string
+    - zone: string
+    - date: Date
+    - temperature: float
+    - precipitation: float
+    - humidity: float
+    - riskLevel: float
+    - inondation: boolean
+    - createdAt: Timestamp
+    --
+    + predict(): void
+    + save(): void
+}
+
+class GeoContext {
+    - id: string
+    - alertId: string
+    - latitude: float
+    - longitude: float
+    - region: string
+    - distanceToFlow: float
+    - insideFloodZone: boolean
+    --
+    + compute(): void
+    + enrich(): void
+}
+
+' ============================================
+' ÉNUMÉRATIONS
+' ============================================
+
+enum RoleType {
+    GUEST
+    CITIZEN
+    LOCAL_ADMIN
+    SUPER_ADMIN
+}
+
+enum AlertStatus {
+    PENDING
+    VERIFIED
+    REJECTED
+    RESOLVED
+}
+
+enum AlertSeverity {
+    LOW
+    MEDIUM
+    HIGH
+    CRITICAL
+}
+
+enum NotificationType {
+    ALERT_CREATED
+    ALERT_VALIDATED
+    ALERT_REJECTED
+    ALERT_RESOLVED
+    INFO_REQUESTED
+}
+
+' ============================================
+' RELATIONS
+' ============================================
+
+User "1" --> "1" UserRole : has
+UserRole "1" --> "1" RoleType : type
+
+User "1" --> "0..*" Alert : creates
+Alert "1" --> "1" AlertStatus : status
+Alert "1" --> "1" AlertSeverity : severity
+
+Alert "1" --> "1..*" AlertImage : contains
+Alert "1" --> "0..*" AlertValidation : has
+Alert "1" --> "0..1" GeoContext : enriched with
+
+User "1" --> "0..*" AlertValidation : performs
+User "1" --> "0..*" Notification : receives
+
+Alert "1" --> "0..*" Notification : triggers
+
+WeatherPrediction "*" --> "1" Alert : informs
+
+' ============================================
+' NOTES
+' ============================================
+
+note right of User
+    <b>Entité principale:</b>
+    Représente tous les utilisateurs
+    (Citoyens, Maires, Super Admins)
+end note
+
+note right of Alert
+    <b>Entité centrale:</b>
+    Signalement d'inondation
+    Cycle de vie: pending → verified/rejected → resolved
+end note
+
+note bottom of AlertValidation
+    <b>Historique:</b>
+    Trace toutes les actions
+    effectuées sur une alerte
+end note
+
+note bottom of WeatherPrediction
+    <b>Prédiction ML:</b>
+    Modèle Random Forest
+    Prédit le risque d'inondation
+end note
+
+note right of GeoContext
+    <b>Enrichissement géospatial:</b>
+    - Distance cours d'eau
+    - Zone inondable
+    - Région
+end note
+
+@enduml

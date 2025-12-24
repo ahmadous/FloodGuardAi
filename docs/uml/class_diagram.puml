@@ -1,0 +1,366 @@
+@startuml Diagramme de Classes - Système de Détection d'Inondations
+
+title Diagramme de Classes - Architecture Professionnelle
+
+skinparam classAttributeIconSize 0
+skinparam class {
+    BackgroundColor<<Entity>> LightBlue
+    BackgroundColor<<Service>> LightGreen
+    BackgroundColor<<Repository>> LightYellow
+    BackgroundColor<<ValueObject>> Wheat
+    BackgroundColor<<Enum>> LightGray
+}
+
+' ============================================
+' COUCHE DOMAINE - ENTITÉS
+' ============================================
+
+package "Domain Layer" {
+
+    class User <<Entity>> {
+        - uid: String
+        - email: String
+        - phoneNumber: String
+        - displayName: String
+        - zone: String
+        - createdAt: Timestamp
+        --
+        + register(): void
+        + updateProfile(data: Object): void
+        + hasRole(role: RoleType): boolean
+        + canAccessZone(zone: String): boolean
+    }
+
+    class UserRole <<Entity>> {
+        - userId: String
+        - role: RoleType
+        - zone: String
+        - permissions: List<String>
+        - assignedAt: Timestamp
+        --
+        + hasPermission(action: String): boolean
+        + grantPermission(permission: String): void
+        + revokePermission(permission: String): void
+    }
+
+    class Alert <<Entity>> {
+        - id: String
+        - userId: String
+        - description: String
+        - location: GeoPoint
+        - zone: String
+        - status: AlertStatus
+        - severity: SeverityLevel
+        - createdAt: Timestamp
+        - updatedAt: Timestamp
+        - validatedAt: Timestamp
+        - validatedBy: String
+        - validationComment: String
+        --
+        + create(): void
+        + validate(validatorId: String, severity: SeverityLevel): void
+        + reject(validatorId: String, reason: String): void
+        + resolve(): void
+        + requestMoreInfo(comment: String): void
+        + canBeValidatedBy(userId: String): boolean
+    }
+
+    class AlertImage <<Entity>> {
+        - id: String
+        - alertId: String
+        - imageUrl: String
+        - storageRef: String
+        - classification: Classification
+        - uploadedAt: Timestamp
+        --
+        + upload(): void
+        + classify(): Classification
+        + delete(): void
+    }
+
+    class Classification <<ValueObject>> {
+        - label: String
+        - probability: Float
+        - model: String
+        - timestamp: Timestamp
+        --
+        + isFlooded(): boolean
+        + getConfidence(): Float
+    }
+
+    class GeoContext <<ValueObject>> {
+        - latitude: Float
+        - longitude: Float
+        - region: String
+        - distanceToWaterBody: Float
+        - insideFloodZone: boolean
+        - nearestRiver: String
+        - elevation: Float
+        --
+        + isHighRisk(): boolean
+        + getProximityScore(): Float
+    }
+
+    class WeatherPrediction <<Entity>> {
+        - id: String
+        - zone: String
+        - date: Date
+        - temperature: Float
+        - precipitation: Float
+        - humidity: Float
+        - windSpeed: Float
+        - floodRisk: Float
+        - isFloodPredicted: boolean
+        - confidence: Float
+        - createdAt: Timestamp
+        --
+        + predict(): void
+        + isHighRisk(): boolean
+        + getRiskLevel(): String
+    }
+
+    class Notification <<Entity>> {
+        - id: String
+        - userId: String
+        - alertId: String
+        - type: NotificationType
+        - title: String
+        - message: String
+        - isRead: boolean
+        - createdAt: Timestamp
+        --
+        + send(): void
+        + markAsRead(): void
+        + delete(): void
+    }
+
+    enum RoleType <<Enum>> {
+        GUEST
+        CITIZEN
+        LOCAL_ADMIN
+        SUPER_ADMIN
+    }
+
+    enum AlertStatus <<Enum>> {
+        PENDING
+        VERIFIED
+        REJECTED
+        RESOLVED
+    }
+
+    enum SeverityLevel <<Enum>> {
+        LOW
+        MEDIUM
+        HIGH
+        CRITICAL
+    }
+
+    enum NotificationType <<Enum>> {
+        ALERT_CREATED
+        ALERT_VALIDATED
+        ALERT_REJECTED
+        ALERT_RESOLVED
+        INFO_REQUESTED
+        WEATHER_ALERT
+    }
+}
+
+' ============================================
+' COUCHE APPLICATION - SERVICES
+' ============================================
+
+package "Application Layer" {
+
+    class AlertService <<Service>> {
+        - alertRepository: AlertRepository
+        - notificationService: NotificationService
+        - classificationService: ClassificationService
+        --
+        + createAlert(data: Object): Alert
+        + validateAlert(alertId: String, validatorId: String): void
+        + rejectAlert(alertId: String, reason: String): void
+        + resolveAlert(alertId: String): void
+        + getAlertsByZone(zone: String): List<Alert>
+        + getAlertsByStatus(status: AlertStatus): List<Alert>
+    }
+
+    class ClassificationService <<Service>> {
+        - modelRegistry: ModelRegistry
+        - imageClassifier: ResNet18Model
+        --
+        + classifyImage(imageFile: File): Classification
+        + healthCheck(): boolean
+    }
+
+    class ForecastService <<Service>> {
+        - modelRegistry: ModelRegistry
+        - weatherModel: RandomForestModel
+        - geoDataService: GeoDataService
+        --
+        + predictFloodRisk(zone: String, date: Date): WeatherPrediction
+        + predictManual(features: Object): WeatherPrediction
+        + predictBatch(samples: List<Object>): List<WeatherPrediction>
+        + predictAuto(zone: String): WeatherPrediction
+    }
+
+    class GeoDataService <<Service>> {
+        - geoRepository: GeoRepository
+        --
+        + computeContext(lat: Float, lon: Float, region: String): GeoContext
+        + getRegions(): List<String>
+        + getFloodZones(region: String): List<Object>
+        + calculateDistanceToWater(lat: Float, lon: Float): Float
+    }
+
+    class NotificationService <<Service>> {
+        - notificationRepository: NotificationRepository
+        --
+        + sendNotification(userId: String, message: String, type: NotificationType): void
+        + notifyAlertValidation(alert: Alert): void
+        + notifyWeatherAlert(zone: String, prediction: WeatherPrediction): void
+        + getUserNotifications(userId: String): List<Notification>
+    }
+
+    class AuthService <<Service>> {
+        - userRepository: UserRepository
+        - roleRepository: RoleRepository
+        --
+        + signIn(email: String, password: String): User
+        + signOut(): void
+        + getCurrentUser(): User
+        + ensureRoleDocument(userId: String): UserRole
+        + updateUserRole(userId: String, role: RoleType): void
+    }
+}
+
+' ============================================
+' COUCHE INFRASTRUCTURE - REPOSITORIES
+' ============================================
+
+package "Infrastructure Layer" {
+
+    interface AlertRepository <<Repository>> {
+        + save(alert: Alert): void
+        + findById(id: String): Alert
+        + findByZone(zone: String): List<Alert>
+        + findByStatus(status: AlertStatus): List<Alert>
+        + update(alert: Alert): void
+        + delete(id: String): void
+    }
+
+    interface UserRepository <<Repository>> {
+        + save(user: User): void
+        + findById(uid: String): User
+        + findByEmail(email: String): User
+        + update(user: User): void
+        + delete(uid: String): void
+    }
+
+    interface RoleRepository <<Repository>> {
+        + save(role: UserRole): void
+        + findByUserId(userId: String): UserRole
+        + update(role: UserRole): void
+    }
+
+    interface NotificationRepository <<Repository>> {
+        + save(notification: Notification): void
+        + findByUserId(userId: String): List<Notification>
+        + markAsRead(id: String): void
+        + delete(id: String): void
+    }
+
+    interface GeoRepository <<Repository>> {
+        + loadShapefile(region: String, layer: String): GeoDataFrame
+        + getRegions(): List<String>
+        + getLayers(region: String): List<String>
+    }
+
+    class ModelRegistry <<Service>> {
+        - modelsPath: String
+        --
+        + loadImageClassifier(): ResNet18Model
+        + loadWeatherModel(): RandomForestModel
+        + loadScaler(): StandardScaler
+        + getMetadata(): Object
+    }
+}
+
+' ============================================
+' COUCHE PRÉSENTATION - API
+' ============================================
+
+package "Presentation Layer" {
+
+    class APIGateway <<Service>> {
+        - classificationServiceUrl: String
+        - forecastServiceUrl: String
+        --
+        + routePredictClass(file: File): Object
+        + routePredictMeteo(data: Object): Object
+        + routeGeoFeatures(lat: Float, lon: Float): Object
+        + health(): Object
+    }
+
+    class APIClient <<Service>> {
+        - gatewayUrl: String
+        - authToken: String
+        --
+        + predictClass(file: File): Promise<Object>
+        + predictMeteo(data: Object): Promise<Object>
+        + getGeoFeatures(lat: Float, lon: Float): Promise<Object>
+        + getAlerts(zone: String): Promise<List<Alert>>
+    }
+}
+
+' ============================================
+' RELATIONS DOMAINE
+' ============================================
+
+User "1" --> "1" UserRole : has
+UserRole "1" --> "1" RoleType : type
+
+User "1" --> "0..*" Alert : creates
+Alert "1" --> "1" AlertStatus : status
+Alert "1" --> "1" SeverityLevel : severity
+Alert "1" --> "1..*" AlertImage : contains
+Alert "1" --> "0..1" GeoContext : enrichedWith
+
+AlertImage "1" --> "1" Classification : has
+
+User "1" --> "0..*" Notification : receives
+Alert "1" --> "0..*" Notification : triggers
+Notification "1" --> "1" NotificationType : type
+
+WeatherPrediction "*" --> "1" Alert : informs
+
+' ============================================
+' RELATIONS APPLICATION
+' ============================================
+
+AlertService "1" --> "1" AlertRepository : uses
+AlertService "1" --> "1" NotificationService : uses
+AlertService "1" --> "1" ClassificationService : uses
+
+ClassificationService "1" --> "1" ModelRegistry : uses
+
+ForecastService "1" --> "1" ModelRegistry : uses
+ForecastService "1" --> "1" GeoDataService : uses
+
+GeoDataService "1" --> "1" GeoRepository : uses
+
+NotificationService "1" --> "1" NotificationRepository : uses
+
+AuthService "1" --> "1" UserRepository : uses
+AuthService "1" --> "1" RoleRepository : uses
+
+' ============================================
+' RELATIONS PRÉSENTATION
+' ============================================
+
+APIGateway "1" --> "1" ClassificationService : delegates
+APIGateway "1" --> "1" ForecastService : delegates
+APIGateway "1" --> "1" GeoDataService : delegates
+
+APIClient "1" --> "1" APIGateway : calls
+
+@enduml

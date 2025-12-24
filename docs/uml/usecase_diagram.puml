@@ -1,0 +1,202 @@
+@startuml Diagramme de Cas d'Utilisation - Système de Détection d'Inondations
+
+left to right direction
+skinparam packageStyle rectangle
+
+' ============================================
+' ACTEURS
+' ============================================
+actor "Citoyen" as Citizen
+actor "Maire" as Mayor
+actor "Super Admin" as SuperAdmin
+
+' Alignement vertical des acteurs
+Citizen -[hidden]down- Mayor
+Mayor -[hidden]down- SuperAdmin
+
+' Héritage entre acteurs
+Mayor -up-|> Citizen : hérite
+SuperAdmin -up-|> Mayor : hérite
+
+' ============================================
+' SYSTÈME
+' ============================================
+rectangle "Système de Détection d'Inondations - Sénégal" {
+
+    ' ----------------------------------------
+    ' PACKAGE : Gestion des Alertes
+    ' ----------------------------------------
+    package "Gestion des Alertes" #LightBlue {
+        usecase "Signaler une\ninondation" as UC1
+        usecase "Uploader photos" as UC1_Sub1
+        usecase "Géolocaliser" as UC1_Sub2
+        usecase "Classifier image" as UC2
+        usecase "Consulter mes\nalertes" as UC4
+    }
+
+    ' ----------------------------------------
+    ' PACKAGE : Prédictions
+    ' ----------------------------------------
+    package "Prédictions Météo" #LightGreen {
+        usecase "Prédiction\nmanuelle" as UC3
+        usecase "Prédiction\nautomatique" as UC_Commun2
+        usecase "Prédiction\nbatch" as UC_Admin2
+    }
+
+    ' ----------------------------------------
+    ' PACKAGE : Cartographie
+    ' ----------------------------------------
+    package "Cartographie" #LightYellow {
+        usecase "Visualiser carte\ninteractive" as UC_Commun1
+        usecase "Consulter alertes\npubliques" as UC_Commun3
+    }
+
+    ' ----------------------------------------
+    ' PACKAGE : Administration Locale
+    ' ----------------------------------------
+    package "Administration Locale" #LightPink {
+        usecase "Valider alertes\n(sa zone)" as UC_Mayor1
+        usecase "Dashboard local" as UC_Mayor2
+        usecase "Notifier citoyens" as UC_Mayor3
+        usecase "Générer rapport\nlocal" as UC_Mayor4
+    }
+
+    ' ----------------------------------------
+    ' PACKAGE : Administration Centrale
+    ' ----------------------------------------
+    package "Administration Centrale" #LightCoral {
+        usecase "Gérer utilisateurs" as UC_Admin1
+        usecase "Rapports nationaux" as UC_Admin3
+        usecase "Configurer système" as UC_Admin4
+    }
+
+    ' ----------------------------------------
+    ' Fonctionnalités transversales
+    ' ----------------------------------------
+    usecase "Voir consignes\nsécurité" as UC_Commun4
+}
+
+' ============================================
+' RELATIONS ACTEURS → CAS D'UTILISATION
+' ============================================
+
+' ---- Relations CITOYEN ----
+Citizen --> UC1
+Citizen --> UC2
+Citizen --> UC3
+Citizen --> UC4
+
+' ---- Relations COMMUNES (via héritage) ----
+Citizen --> UC_Commun1
+Citizen --> UC_Commun2
+Citizen --> UC_Commun3
+Citizen --> UC_Commun4
+
+' ---- Relations MAIRE ----
+Mayor --> UC_Mayor1
+Mayor --> UC_Mayor2
+Mayor --> UC_Mayor3
+
+' ---- Relations SUPER ADMIN ----
+SuperAdmin --> UC_Admin1
+SuperAdmin --> UC_Admin2
+SuperAdmin --> UC_Admin3
+SuperAdmin --> UC_Admin4
+
+' ==========================================
+' Relations INCLUDE (obligatoires)
+' ==========================================
+
+' Signaler une inondation NÉCESSITE toujours:
+UC1 ..> UC1_Sub1 : <<include>>
+UC1 ..> UC1_Sub2 : <<include>>
+UC1 ..> UC2 : <<include>>
+
+
+
+' Géolocaliser NÉCESSITE la carte
+UC1_Sub2 ..> UC_Commun1 : <<include>>
+
+' Prédiction automatique AFFICHE toujours sur la carte
+UC_Commun2 ..> UC_Commun1 : <<include>>
+
+' Prédiction manuelle NÉCESSITE la carte pour visualiser
+UC3 ..> UC_Commun1 : <<include>>
+
+' Valider alerte DOIT consulter les alertes
+UC_Mayor1 ..> UC4 : <<include>>
+
+' Dashboard local AFFICHE toujours les alertes
+UC_Mayor2 ..> UC_Commun3 : <<include>>
+
+' ==========================================
+' Relations EXTEND (optionnelles)
+' ==========================================
+
+' APRÈS validation, le maire PEUT notifier (optionnel)
+UC_Mayor3 ..> UC_Mayor1 : <<extend>>
+
+' DEPUIS le dashboard, le maire PEUT générer un rapport (optionnel)
+UC_Mayor4 ..> UC_Mayor2 : <<extend>>
+
+' SI risque élevé, l'utilisateur PEUT créer une alerte (optionnel)
+UC1 ..> UC3 : <<extend>>
+
+' APRÈS classification, l'utilisateur PEUT consulter ses alertes (optionnel)
+UC4 ..> UC2 : <<extend>>
+
+' ============================================
+' NOTES ET LÉGENDES
+' ============================================
+
+note left of Citizen
+  <b>HIÉRARCHIE DES ACTEURS</b>
+
+  Citoyen (base)
+    ↓ hérite
+  Maire (+ admin local)
+    ↓ hérite
+  Super Admin (+ admin national)
+
+  Les admins héritent de
+  toutes les permissions
+  des niveaux inférieurs.
+end note
+
+note as LegendRelations
+  <b>LÉGENDE DES RELATIONS</b>
+
+  <b><<include>></b> (obligatoire)
+  • A ..> B : <<include>>
+  • A nécessite TOUJOURS B
+  • Exemple: Signaler → Uploader photo
+
+  <b><<extend>></b> (optionnel)
+  • B ..> A : <<extend>>
+  • B peut étendre A selon conditions
+  • Exemple: Notification → Validation
+end note
+
+note right of UC1
+  <b>Signalement complet:</b>
+  1. Uploader photos
+  2. Géolocaliser
+  3. Classifier image
+
+  Ces 3 étapes sont obligatoires
+  (<<include>>)
+end note
+
+note right of UC_Mayor1
+  <b>Portée maire:</b>
+  Accès limité à SA zone
+  (Dakar, Saint-Louis, Kaolack...)
+end note
+
+note right of UC_Admin3
+  <b>Portée super admin:</b>
+  Accès à TOUTES les régions
+  du Sénégal
+end note
+
+@enduml

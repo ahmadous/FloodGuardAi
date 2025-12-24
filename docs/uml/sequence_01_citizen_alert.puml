@@ -1,0 +1,85 @@
+@startuml Séquence 1 - Citoyen crée une alerte d'inondation
+
+actor "Citoyen" as Citizen
+participant "Frontend\n(Vue.js)" as Frontend
+participant "Firebase\nAuth" as FirebaseAuth
+participant "Firebase\nFirestore" as Firestore
+participant "API Gateway" as Gateway
+participant "Classification\nService" as ClassifService
+participant "Model\nRegistry" as ModelReg
+participant "ResNet18\nModel" as ResNet
+
+title Scénario: Un citoyen signale une inondation avec photo
+
+== Authentification ==
+Citizen -> Frontend: Clique "Signaler"
+Frontend -> FirebaseAuth: Vérifier authentification
+
+alt Utilisateur authentifié
+    FirebaseAuth --> Frontend: User authenticated
+
+    == Saisie de l'alerte ==
+    Citizen -> Frontend: Remplit formulaire\n(description, localisation)
+    Citizen -> Frontend: Upload photo de la zone
+
+    == Classification de l'image ==
+    Frontend -> Gateway: POST /predict_class\n(formData: file)
+    Gateway -> ClassifService: Forward request
+    ClassifService -> ModelReg: get_image_transform()
+    ModelReg --> ClassifService: transform
+    ClassifService -> ClassifService: load_image(file)\npreprocess(image)
+
+    alt Classification réussie
+        ClassifService -> ResNet: predict(image_tensor)
+        ResNet --> ClassifService: probabilities
+        ClassifService -> ClassifService: argmax(probabilities)
+        ClassifService --> Gateway: {prediction: "flooded",\nproba: 0.87}
+        Gateway --> Frontend: Classification result
+
+        == Enrichissement avec géolocalisation ==
+        Frontend -> Frontend: Obtenir coordonnées GPS\n(lat, lon)
+
+        opt Géolocalisation disponible
+            Frontend -> Gateway: GET /geo/features?\nlat=14.6937&lon=-17.4441
+            Gateway -> Gateway: compute_context_features()
+            Gateway --> Frontend: {distance_to_flow_m: 245,\ninside_flood_zone: true,\nregion: "dakar"}
+        end
+
+        == Sauvegarde de l'alerte ==
+        Frontend -> Firestore: createDoc('alerts', {\n  userId: uid,\n  description: "...",\n  location: GeoPoint(lat, lon),\n  zone: "Dakar",\n  images: [url],\n  classification: {...},\n  geo_context: {...},\n  status: "pending",\n  severity: "high",\n  createdAt: now\n})
+
+        alt Sauvegarde réussie
+            Firestore --> Frontend: Alert ID
+            Frontend --> Citizen: ✓ Alerte créée avec succès\nID: ALT-12345
+        else Erreur de sauvegarde
+            Firestore --> Frontend: Error
+            Frontend --> Citizen: ❌ Erreur lors de la sauvegarde
+        end
+
+    else Erreur de classification
+        ClassifService --> Gateway: {error: "Invalid image"}
+        Gateway --> Frontend: Error response
+        Frontend --> Citizen: ❌ Erreur: Image invalide
+    end
+
+else Utilisateur non authentifié
+    FirebaseAuth --> Frontend: Not authenticated
+    Frontend --> Citizen: ❌ Veuillez vous connecter
+end
+
+note right of ClassifService
+  Classification automatique
+  pour triage initial:
+  - flooded (87%)
+  - not_flooded (13%)
+end note
+
+note right of Firestore
+  L'alerte est stockée avec:
+  - Données utilisateur
+  - Résultat classification
+  - Contexte géographique
+  - Statut "pending"
+end note
+
+@enduml

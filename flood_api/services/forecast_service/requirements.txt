@@ -1,0 +1,11 @@
+flask>=3.0
+flask-cors>=4.0
+joblib>=1.4
+numpy==1.26.4
+pandas>=2.2
+requests>=2.31
+scikit-learn==1.6.1
+geopandas>=0.14
+shapely>=2.0
+rtree>=1.2
+pyogrio>=0.7

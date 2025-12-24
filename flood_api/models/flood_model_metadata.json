@@ -1,0 +1,42 @@
+{
+  "features": [
+    "precipitation_mm_sum",
+    "precipitation_mm_max",
+    "relative_humidity_2m_pct_mean",
+    "relative_humidity_2m_pct_max",
+    "temperature_2m_degc_mean",
+    "temperature_2m_degc_max"
+  ],
+  "rainy_months": [
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "train_span": {
+    "start": "pending",
+    "end": "pending"
+  },
+  "test_span": {
+    "start": "pending",
+    "end": "pending"
+  },
+  "performance": {
+    "roc_auc_test": null,
+    "average_precision_test": null,
+    "recall_test": null,
+    "precision_test": null,
+    "f1_test": null
+  },
+  "class_support": {
+    "train_total": null,
+    "train_positive": null,
+    "test_total": null,
+    "test_positive": null
+  },
+  "label_thresholds": {
+    "daily_rain_mm": null,
+    "three_day_rain_mm": null
+  }
+}

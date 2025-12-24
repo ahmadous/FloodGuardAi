@@ -1,0 +1,221 @@
+@startuml Diagramme de Composants - Communication entre Services
+
+title Communication entre Services - Système de Détection d'Inondations
+
+skinparam componentStyle rectangle
+
+' ============================================
+' FRONTEND
+' ============================================
+
+package "Frontend (Vue.js)" {
+    [Application Web\nVue.js 3] as WebApp
+    [APIClient] as APIClient
+    [AuthService] as AuthService
+}
+
+' ============================================
+' API GATEWAY
+' ============================================
+
+[API Gateway\nFlask - Port 5000] as Gateway
+
+' ============================================
+' MICROSERVICES
+' ============================================
+
+package "Classification Service\nPort 5001" {
+    [Classification API\nFlask] as ClassifAPI
+    [ResNet18\nModel] as ResNet
+}
+
+package "Forecast Service\nPort 5002" {
+    [Forecast API\nFlask] as ForecastAPI
+    [Random Forest\nModel] as RF
+    [Forecast Engine] as Engine
+}
+
+' ============================================
+' SERVICES PARTAGÉS
+' ============================================
+
+package "Shared Layer" {
+    [GeoData Service] as GeoDataService
+    [Model Registry] as ModelRegistry
+    [Config] as Config
+}
+
+' ============================================
+' BASES DE DONNÉES
+' ============================================
+
+database "Firebase\nFirestore" as Firestore {
+}
+
+database "Firebase\nAuth" as FirebaseAuth {
+}
+
+database "Modèles ML" as ModelsDB {
+}
+
+database "Données Géo" as GeoDB {
+}
+
+' ============================================
+' API EXTERNE
+' ============================================
+
+cloud "Open-Meteo API" as OpenMeteo {
+}
+
+' ============================================
+' RELATIONS FRONTEND
+' ============================================
+
+WebApp --> APIClient : utilise
+WebApp --> AuthService : utilise
+
+APIClient --> Gateway : HTTP REST\n/predict_class\n/predict_meteo\n/geo/features
+
+AuthService --> FirebaseAuth : Authentification
+
+WebApp --> Firestore : CRUD\nalertes/users
+
+' ============================================
+' RELATIONS GATEWAY → SERVICES
+' ============================================
+
+Gateway --> ClassifAPI : Proxy HTTP\nPOST /predict_class
+Gateway --> ForecastAPI : Proxy HTTP\nPOST /predict_meteo*
+
+Gateway --> GeoDataService : Appelle\nGET /geo/*
+
+' ============================================
+' RELATIONS SERVICES → COMPOSANTS INTERNES
+' ============================================
+
+ClassifAPI --> ResNet : utilise
+ForecastAPI --> RF : utilise
+ForecastAPI --> Engine : utilise
+
+' ============================================
+' RELATIONS SERVICES → SHARED
+' ============================================
+
+ClassifAPI --> ModelRegistry : charge modèles
+ForecastAPI --> ModelRegistry : charge modèles
+
+ForecastAPI --> GeoDataService : appelle
+
+ClassifAPI --> Config : lit config
+ForecastAPI --> Config : lit config
+GeoDataService --> Config : lit config
+
+' ============================================
+' RELATIONS SERVICES → DATA
+' ============================================
+
+ModelRegistry --> ModelsDB : charge\nResNet18.pth\nRandomForest.pkl
+
+GeoDataService --> GeoDB : lit\ndakar.gpkg\nsaintlouis.gpkg
+
+ForecastAPI --> OpenMeteo : GET /forecast\n(données météo)
+
+' ============================================
+' NOTES
+' ============================================
+
+note right of Gateway
+  <b>API Gateway</b>
+  Pattern: Gateway/Proxy
+
+  <b>Routes exposées:</b>
+  • /predict_class
+  • /predict_meteo
+  • /predict_meteo_manual
+  • /predict_meteo_batch
+  • /predict_meteo_auto
+  • /geo/regions
+  • /geo/features
+  • /health
+end note
+
+note bottom of ClassifAPI
+  <b>Classification Service</b>
+
+  <b>Fonction:</b>
+  Classifier images d'inondation
+
+  <b>Modèle:</b>
+  ResNet18 (PyTorch)
+
+  <b>Output:</b>
+  flooded / not_flooded + proba
+end note
+
+note bottom of ForecastAPI
+  <b>Forecast Service</b>
+
+  <b>Fonctions:</b>
+  • Prédiction manuelle
+  • Prédiction automatique
+  • Prédiction batch
+
+  <b>Modèle:</b>
+  Random Forest (scikit-learn)
+
+  <b>Enrichissement:</b>
+  Données géospatiales
+end note
+
+note bottom of GeoDataService
+  <b>GeoData Service</b>
+
+  <b>Responsabilités:</b>
+  • Charger shapefiles
+  • Calculer distances
+  • Identifier zones inondables
+
+  <b>Régions:</b>
+  Dakar, Saint-Louis, Kaolack
+end note
+
+' ============================================
+' LÉGENDE
+' ============================================
+
+legend right
+  <b>Flux de communication:</b>
+
+  <b>1. Client → Gateway</b>
+     HTTP REST (JSON)
+     Port 5000
+
+  <b>2. Gateway → Microservices</b>
+     Proxy HTTP
+     Ports 5001 et 5002
+
+  <b>3. Services → Shared Layer</b>
+     Appels Python directs
+     (même application)
+
+  <b>4. Services → Données</b>
+     Lecture fichiers
+     (modèles ML + geodata)
+
+  <b>5. Forecast → API Externe</b>
+     HTTPS REST
+     Open-Meteo
+
+  <b>6. Frontend → Firebase</b>
+     WebSocket (temps réel)
+     Auth + Firestore
+
+  ---
+  <b>Ports réseau:</b>
+  • Gateway: 5000
+  • Classification: 5001
+  • Forecast: 5002
+end legend
+
+@enduml

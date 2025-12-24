@@ -1,0 +1,137 @@
+@startuml Architecture Globale - Système de Détection d'Inondations
+
+title Architecture Globale du Système
+
+skinparam rectangle {
+    BackgroundColor<<frontend>> LightBlue
+    BackgroundColor<<backend>> LightGreen
+    BackgroundColor<<service>> LightYellow
+    BackgroundColor<<data>> LightPink
+    BackgroundColor<<external>> LightGray
+}
+
+' ============================================
+' COUCHE PRÉSENTATION
+' ============================================
+
+package "Couche Présentation" {
+    rectangle "Frontend Vue.js\n(Port 5173)" <<frontend>> as Frontend
+    rectangle "Leaflet\n(Cartes)" <<frontend>> as Leaflet
+    rectangle "Chart.js\n(Graphiques)" <<frontend>> as Charts
+}
+
+' ============================================
+' COUCHE API GATEWAY
+' ============================================
+
+package "Couche API" {
+    rectangle "API Gateway\nFlask\n(Port 5000)" <<backend>> as Gateway
+}
+
+' ============================================
+' COUCHE MICROSERVICES
+' ============================================
+
+package "Couche Microservices" {
+    rectangle "Classification Service\nFlask + ResNet18\n(Port 5001)" <<service>> as ClassifService
+    rectangle "Forecast Service\nFlask + Random Forest\n(Port 5002)" <<service>> as ForecastService
+    rectangle "GeoData Service\nCalculs géospatiaux" <<service>> as GeoService
+}
+
+' ============================================
+' COUCHE DONNÉES
+' ============================================
+
+package "Couche Données" {
+    database "Firebase\nAuth + Firestore" <<data>> as Firebase
+    database "Modèles ML\nResNet18\nRandom Forest" <<data>> as Models
+    database "Données Géo\nShapefiles\n(Dakar, SL, Kaolack)" <<data>> as GeoData
+}
+
+' ============================================
+' SERVICES EXTERNES
+' ============================================
+
+cloud "Open-Meteo API\nDonnées météo" <<external>> as OpenMeteo
+
+' ============================================
+' RELATIONS
+' ============================================
+
+' Frontend → Services
+Frontend --> Leaflet : utilise
+Frontend --> Charts : utilise
+Frontend --> Firebase : Auth + CRUD\nalertes/users
+Frontend --> Gateway : HTTP REST\n/predict_class\n/predict_meteo\n/geo/*
+
+' Gateway → Microservices
+Gateway --> ClassifService : Proxy HTTP\nPOST /predict_class
+Gateway --> ForecastService : Proxy HTTP\nPOST /predict_meteo*
+Gateway --> GeoService : Appels directs\nGET /geo/*
+
+' Microservices → Données
+ClassifService --> Models : Charge ResNet18
+ForecastService --> Models : Charge Random Forest
+GeoService --> GeoData : Lit shapefiles
+
+' Services externes
+ForecastService --> OpenMeteo : GET forecast\nHTTPS
+
+' ============================================
+' NOTES
+' ============================================
+
+note top of Frontend
+    <b>Utilisateurs:</b>
+    • Citoyens (créer alertes)
+    • Maires (valider alertes)
+    • Super Admins (administration)
+end note
+
+note bottom of Gateway
+    <b>Rôle:</b>
+    Point d'entrée unique (API Gateway pattern)
+    Routage vers les microservices
+end note
+
+note right of ClassifService
+    <b>Classification d'images</b>
+    Input: Photo zone
+    Output: flooded / not_flooded + proba
+    Modèle: ResNet18 (PyTorch)
+end note
+
+note right of ForecastService
+    <b>Prédiction météo</b>
+    Input: Localisation + météo
+    Output: Risque inondation
+    Modèle: Random Forest (scikit-learn)
+end note
+
+note bottom of Firebase
+    <b>Collections:</b>
+    • users (profils)
+    • alerts (signalements)
+    • userRoles (permissions)
+    • notifications
+end note
+
+legend right
+    <b>Architecture:</b>
+    • Pattern: Microservices + API Gateway
+    • Frontend: SPA (Vue.js 3)
+    • Backend: Python + Flask
+    • ML: PyTorch + scikit-learn
+    • Database: Firebase (NoSQL)
+    • Containerisation: Docker Compose
+
+    <b>Flux principal:</b>
+    1. Citoyen upload photo → Frontend
+    2. Frontend → API Gateway
+    3. Gateway → Classification Service
+    4. Classification → Modèle ResNet18
+    5. Résultat → Frontend → Firestore
+    6. Maire valide → Alerte archivée
+end legend
+
+@enduml

@@ -1,0 +1,43 @@
+{
+  "features": [
+    "precipitation_mm_sum",
+    "precipitation_mm_max",
+    "relative_humidity_2m_pct_mean",
+    "relative_humidity_2m_pct_max",
+    "temperature_2m_degc_mean",
+    "temperature_2m_degc_max",
+    "precip_3d_sum",
+    "precip_7d_sum",
+    "precip_15d_sum"
+  ],
+  "rainy_months": [
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "train_span": {
+    "start": "2005-06-01 00:00:00",
+    "end": "2022-10-31 00:00:00"
+  },
+  "test_span": {
+    "start": "2023-06-01 00:00:00",
+    "end": "2025-07-31 00:00:00"
+  },
+  "label_thresholds": {
+    "daily_rain_mm": 20.3,
+    "three_day_rain_mm": 39.0
+  },
+  "decision_threshold": 0.35,
+  "performance": {
+    "roc_auc": 1.0,
+    "average_precision": 1.0,
+    "precision": 0.9950980392156863,
+    "recall": 1.0,
+    "f1": 0.9975429975429976,
+    "accuracy": 0.9995458673932789,
+    "support_positif": 203,
+    "support_total": 2202
+  }
+}

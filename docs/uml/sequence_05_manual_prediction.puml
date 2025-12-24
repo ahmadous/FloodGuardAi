@@ -1,0 +1,106 @@
+@startuml Séquence 5 - Prédiction manuelle par un citoyen
+
+actor "Citoyen" as Citizen
+participant "Frontend\n(Vue.js)" as Frontend
+participant "API Gateway" as Gateway
+participant "Forecast\nService" as ForecastSvc
+participant "GeoData\nService" as GeoDataSvc
+participant "Forecast\nEngine" as Engine
+participant "Random Forest\nModel" as RFModel
+participant "Scaler" as Scaler
+
+title Scénario: Un citoyen saisit manuellement des données météo pour prédiction
+
+== Saisie des données ==
+Citizen -> Frontend: Accède "Prédiction manuelle"
+Frontend --> Citizen: Affiche formulaire
+
+Citizen -> Frontend: Saisit données de base:\n- Précipitations: 75 mm\n- Humidité: 85%\n- Température: 28°C
+
+Citizen -> Frontend: [Optionnel] Active "Avancé"
+Citizen -> Frontend: Saisit données avancées:\n- Précip max: 95 mm\n- Humidité max: 92%\n- Temp max: 32°C\n- Cumul 3j: 150 mm\n- Cumul 7j: 280 mm\n- Cumul 15j: 420 mm
+
+Citizen -> Frontend: Sélectionne localisation:\n"Ma position actuelle"\nou saisit lat/lon manuel
+
+Frontend -> Frontend: Obtient géolocalisation:\nlat=14.7167, lon=-17.4677\nRégion détectée: Dakar
+
+== Validation et envoi ==
+Citizen -> Frontend: Clique "Prédire"
+Frontend -> Frontend: Valide données:\n- precipitation >= 0\n- humidity 0-100\n- temperature -50 to +60
+
+Frontend -> Gateway: POST /predict_meteo_manual\n{\n  precipitation: 75,\n  humidity: 85,\n  temperature: 28,\n  precipitation_max: 95,\n  humidity_max: 92,\n  temperature_max: 32,\n  precip_3d_sum: 150,\n  precip_7d_sum: 280,\n  precip_15d_sum: 420,\n  lat: 14.7167,\n  lon: -17.4677,\n  region: "dakar"\n}
+Gateway -> ForecastSvc: Forward request
+
+== Traitement backend ==
+ForecastSvc -> ForecastSvc: Valide champs requis:\n_require_float(precipitation)\n_require_float(humidity)\n_require_float(temperature)
+
+ForecastSvc -> Engine: build_feature_vector(\n  precipitation_sum=75,\n  humidity_mean=85,\n  temperature_mean=28,\n  precipitation_max=95,\n  humidity_max=92,\n  temperature_max=32,\n  precip_3d_sum=150,\n  precip_7d_sum=280,\n  precip_15d_sum=420\n)
+
+Engine -> Engine: Construit vecteur:\n[\n  precipitation_mm_sum: 75,\n  precipitation_mm_max: 95,\n  relative_humidity_2m_pct_mean: 85,\n  relative_humidity_2m_pct_max: 92,\n  temperature_2m_degc_mean: 28,\n  temperature_2m_degc_max: 32,\n  precip_3d_sum: 150,\n  precip_7d_sum: 280,\n  precip_15d_sum: 420\n]
+Engine --> ForecastSvc: feature_vector
+
+== Enrichissement géographique ==
+ForecastSvc -> GeoDataSvc: compute_context_features(\n  lat=14.7167,\n  lon=-17.4677,\n  region="dakar"\n)
+GeoDataSvc -> GeoDataSvc: load_layer("dakar",\n"Axe_ecoulement_temporaire")
+GeoDataSvc -> GeoDataSvc: Calculate distance\nto nearest flow
+GeoDataSvc -> GeoDataSvc: load_layer("dakar",\n"Zone_inondable_humide")
+GeoDataSvc -> GeoDataSvc: Check if point\ninside flood zone
+GeoDataSvc --> ForecastSvc: {\n  geo_available: true,\n  distance_to_flow_m: 180,\n  inside_flood_zone: true,\n  region: "dakar"\n}
+
+== Prédiction ML ==
+ForecastSvc -> Engine: predict_from_features(\n  feature_vector,\n  rf_model,\n  scaler\n)
+Engine -> Scaler: transform(feature_vector)
+Scaler --> Engine: scaled_features
+Engine -> RFModel: predict_proba(scaled_features)
+RFModel --> Engine: [[0.24, 0.76]]
+Engine -> Engine: prediction = \n(0.76 >= 0.35) ? 1 : 0
+Engine --> ForecastSvc: PredictionResult(\n  prediction=1,\n  proba_inondation=0.76,\n  inondation=true\n)
+
+== Retour du résultat ==
+ForecastSvc --> Gateway: {\n  prediction: 1,\n  proba_inondation: 0.76,\n  inondation: true,\n  geo_context: {\n    distance_to_flow_m: 180,\n    inside_flood_zone: true,\n    region: "dakar"\n  },\n  features: {...}\n}
+Gateway --> Frontend: Prediction response
+
+== Affichage des résultats ==
+Frontend -> Frontend: Affiche résultat avec:\n- Jauge de risque (76%)\n- Couleur rouge (HIGH)\n- Icône alerte
+
+Frontend --> Citizen: ⚠️ RISQUE ÉLEVÉ D'INONDATION\n\n🌧️ Probabilité: 76%\n\n📍 Contexte géographique:\n  • Distance cours d'eau: 180m\n  • Dans zone inondable: Oui\n  • Région: Dakar\n\n💡 Recommandations:\n  • Surveiller la situation\n  • Préparer évacuation\n  • Consulter consignes de sécurité\n\n[Créer une alerte] [Voir carte]
+
+== Actions complémentaires ==
+alt Citoyen veut créer alerte
+    Citizen -> Frontend: Clique "Créer une alerte"
+    Frontend -> Frontend: Pré-remplit formulaire\navec données de prédiction
+    note right: Voir séquence 01\npour suite du processus
+else Citoyen veut voir carte
+    Citizen -> Frontend: Clique "Voir carte"
+    Frontend -> Frontend: Affiche carte Leaflet:\n- Marker position\n- Rayon risque 76%\n- Couches zones inondables
+end
+
+note right of Engine
+  Le modèle utilise TOUTES
+  les features si disponibles.
+
+  Si features avancées manquantes,
+  elles sont déduites des basiques:
+  - max = mean si non fourni
+  - precip_Xd = precip_1d si non fourni
+end note
+
+note right of ForecastSvc
+  Valeurs par défaut intelligentes:
+  - precipitation_max = precipitation_sum
+  - humidity_max = humidity_mean
+  - temp_max = temp_mean
+  - precip_3d/7d/15d = precip_sum
+
+  Permet usage simplifié!
+end note
+
+note bottom of Citizen
+  Cas d'usage:
+  - Vérifier risque avant déplacement
+  - Tester "what-if" scénarios
+  - Éducation/sensibilisation
+  - Vérification prédiction auto
+end note
+
+@enduml

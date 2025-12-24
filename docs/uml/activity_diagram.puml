@@ -1,0 +1,211 @@
+@startuml Diagramme d'Activité - Workflow Gestion d'une Alerte
+
+title Workflow Complet - Gestion d'une Alerte d'Inondation
+
+|Citoyen|
+start
+:Accède à l'application;
+
+if (Utilisateur authentifié ?) then (oui)
+    :Clique sur "Signaler une inondation";
+
+    :Remplit le formulaire;
+    note right
+        - Description
+        - Localisation
+        - Zone géographique
+    end note
+
+    :Upload photo(s) de la zone;
+
+    |Système|
+    :Classification automatique\nde l'image (ResNet18);
+
+    if (Image valide ?) then (oui)
+        :Calcule probabilité\nflooded/not_flooded;
+
+        if (Géolocalisation disponible ?) then (oui)
+            :Enrichit avec contexte géo;
+            note right
+                - Distance cours d'eau
+                - Zone inondable
+                - Région
+            end note
+        else (non)
+            :Continue sans contexte géo;
+        endif
+
+        :Sauvegarde alerte dans Firestore;
+        note right
+            Statut initial: "pending"
+            Sévérité: calculée selon IA
+        end note
+
+        |Citoyen|
+        :Reçoit confirmation\navec ID alerte;
+
+        |Système|
+        :Notifie le maire de la zone;
+
+        |Maire|
+        :Reçoit notification\nnouvelle alerte;
+
+        while (Autres alertes en attente ?) is (oui)
+            :Consulte dashboard\nalertes en attente;
+
+            :Sélectionne une alerte\npour examen;
+
+            :Visualise les détails;
+            note right
+                - Photos
+                - Carte interactive
+                - Classification IA
+                - Contexte géographique
+                - Description citoyen
+            end note
+
+            :Analyse la situation;
+
+            if (Décision du maire ?) then (valider)
+                :Sélectionne niveau de sévérité;
+                note right
+                    - LOW
+                    - MEDIUM
+                    - HIGH
+                    - CRITICAL
+                end note
+
+                :Ajoute commentaire de validation;
+
+                |Système|
+                :Met à jour statut → "verified";
+
+                :Envoie notification au citoyen;
+                note right
+                    "Votre alerte a été validée"
+                end note
+
+                if (Sévérité >= HIGH ?) then (oui)
+                    :Déclenche alerte publique;
+                    :Notifie citoyens de la zone;
+                else (non)
+                    :Enregistre validation;
+                endif
+
+                if (Alerte CRITICAL ?) then (oui)
+                    |Super Admin|
+                    :Reçoit notification urgente;
+                    :Supervise les actions;
+                    |Maire|
+                else (non)
+                endif
+
+                :Lance actions terrain;
+                note right
+                    - Déploiement équipes
+                    - Évacuations si nécessaire
+                    - Surveillance zone
+                end note
+
+                while (Situation en cours ?) is (oui)
+                    :Surveille évolution situation;
+
+                    if (Situation résolue ?) then (oui)
+                        :Marque alerte → "resolved";
+
+                        |Système|
+                        :Notifie le citoyen;
+                        :Archive l'alerte;
+                        :Met à jour statistiques;
+
+                        break
+                    else (non)
+                        |Maire|
+                        :Continue surveillance;
+                    endif
+                endwhile (non)
+
+            elseif (rejeter) then
+                |Maire|
+                :Ajoute commentaire de rejet;
+
+                |Système|
+                :Met à jour statut → "rejected";
+                :Envoie notification au citoyen;
+                note right
+                    "Alerte rejetée" + raison
+                end note
+
+            else (demander infos)
+                |Maire|
+                :Demande informations\ncomplémentaires;
+
+                |Système|
+                :Envoie notification au citoyen;
+
+                |Citoyen|
+                :Fournit informations\nsupplémentaires;
+
+                |Système|
+                :Met à jour l'alerte;
+            endif
+
+        endwhile (non)
+
+        |Super Admin|
+        :Génère rapports statistiques;
+        note right
+            - Alertes par région
+            - Temps de traitement
+            - Taux de validation
+            - Zones critiques
+        end note
+
+        :Analyse tendances;
+        :Planifie actions préventives;
+
+    else (non)
+        |Système|
+        :Rejette l'image;
+
+        |Citoyen|
+        :Reçoit message d'erreur;
+        note right
+            "Image invalide,
+            veuillez réessayer"
+        end note
+
+        stop
+    endif
+
+else (non)
+    |Citoyen|
+    :Redirection vers page login;
+    :S'authentifie;
+
+    backward :Retour au début;
+endif
+
+stop
+
+legend right
+    <b>Statuts des alertes:</b>
+    • <b>pending</b> : En attente validation maire
+    • <b>verified</b> : Validée par le maire
+    • <b>rejected</b> : Rejetée par le maire
+    • <b>resolved</b> : Situation résolue
+
+    <b>Niveaux de sévérité:</b>
+    • <b>LOW</b> : Surveillance simple
+    • <b>MEDIUM</b> : Attention requise
+    • <b>HIGH</b> : Action immédiate
+    • <b>CRITICAL</b> : Urgence nationale
+
+    <b>Acteurs:</b>
+    • <b>Citoyen</b> : Créateur de l'alerte
+    • <b>Maire</b> : Validateur local
+    • <b>Super Admin</b> : Superviseur national
+    • <b>Système</b> : Automatisations
+end legend
+
+@enduml

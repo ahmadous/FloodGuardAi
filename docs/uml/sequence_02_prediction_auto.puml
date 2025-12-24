@@ -1,0 +1,88 @@
+@startuml Séquence 2 - Prédiction automatique météo
+
+actor "Utilisateur" as User
+participant "Frontend\n(Vue.js)" as Frontend
+participant "API Gateway" as Gateway
+participant "Forecast\nService" as ForecastSvc
+participant "Open-Meteo\nAPI" as OpenMeteo
+participant "GeoData\nService" as GeoDatasvc
+participant "Forecast\nEngine" as Engine
+participant "Random Forest\nModel" as RFModel
+participant "Scaler" as Scaler
+
+title Scénario: Prédiction automatique des inondations pour une zone
+
+== Sélection de la zone ==
+User -> Frontend: Sélectionne zone\n"Dakar Keur Massar"
+Frontend -> Frontend: Récupère coordonnées\nlat=15.43058, lon=-15.887329
+
+== Requête de prédiction ==
+Frontend -> Gateway: POST /predict_meteo_auto\n{zone: "dakar_keur_massar"}
+Gateway -> ForecastSvc: Forward request
+
+== Récupération données météo ==
+ForecastSvc -> OpenMeteo: GET forecast?\nlat=15.43058&lon=-15.887329\n&hourly=temp,humidity,precip\n&forecast_days=5
+
+alt Données météo disponibles
+    OpenMeteo --> ForecastSvc: JSON hourly data\n(5 jours × 24h)
+else API météo indisponible
+    OpenMeteo --> ForecastSvc: Error 502
+    ForecastSvc --> Gateway: {error: "Service météo indisponible"}
+    Gateway --> Frontend: Error response
+    Frontend --> User: ❌ Service temporairement indisponible
+end
+
+== Calcul contexte géographique ==
+opt Région avec données géospatiales
+    ForecastSvc -> GeoDatasvc: compute_context_features(\nlat, lon, region="dakar")
+    GeoDatasvc -> GeoDatasvc: load_layer("dakar",\n"Axe_ecoulement_temporaire")
+    GeoDatasvc -> GeoDatasvc: calculate distance_to_flow
+    GeoDatasvc -> GeoDatasvc: load_layer("dakar",\n"Zone_inondable_humide")
+    GeoDatasvc -> GeoDatasvc: check if point inside
+    GeoDatasvc --> ForecastSvc: {distance_to_flow_m: 320,\ninside_flood_zone: false}
+end
+
+== Agrégation et prédiction jour par jour ==
+loop Pour chaque jour (J à J+5)
+    ForecastSvc -> Engine: aggregate_daily_features(\nday_slice, recent_precip)
+    Engine -> Engine: Calcule:\n- precip_sum (1j)\n- precip_3d_sum\n- precip_7d_sum\n- precip_15d_sum\n- humidity_mean/max\n- temp_mean/max
+    Engine --> ForecastSvc: feature_vector[9 features]
+
+    ForecastSvc -> Engine: predict_from_features(\nvector, rf_model, scaler)
+    Engine -> Engine: _as_model_input(features)
+    Engine -> Scaler: transform(features)
+    Scaler --> Engine: scaled_features
+    Engine -> RFModel: predict_proba(scaled_features)
+    RFModel --> Engine: [proba_no_flood, proba_flood]
+    Engine -> Engine: prediction = \n(proba_flood >= 0.35) ? 1 : 0
+    Engine --> ForecastSvc: PredictionResult(\nprediction=1,\nproba_inondation=0.72)
+
+    ForecastSvc -> ForecastSvc: results.append({\n  date, precip_sums,\n  proba, inondation,\n  geo_context\n})
+end
+
+== Retour des résultats ==
+ForecastSvc --> Gateway: {\n  zone: "dakar_keur_massar",\n  geo_context: {...},\n  results: [5 prédictions]\n}
+Gateway --> Frontend: Predictions JSON
+Frontend -> Frontend: Affiche graphique\nChart.js (courbes)
+Frontend --> User: 📊 Prédictions 5 jours:\n✓ J+1: 72% risque\n✓ J+2: 45% risque\n✓ J+3: 23% risque\n...
+
+note right of Engine
+  Features extraites:
+  1. precipitation_mm_sum
+  2. precipitation_mm_max
+  3. relative_humidity_2m_pct_mean
+  4. relative_humidity_2m_pct_max
+  5. temperature_2m_degc_mean
+  6. temperature_2m_degc_max
+  7. precip_3d_sum (rolling)
+  8. precip_7d_sum (rolling)
+  9. precip_15d_sum (rolling)
+end note
+
+note right of RFModel
+  Seuil de décision: 0.35
+  Si proba >= 0.35 → Inondation
+  Sinon → Pas d'inondation
+end note
+
+@enduml
