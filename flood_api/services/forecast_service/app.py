@@ -291,7 +291,9 @@ def predict_meteo_auto():
             }
         )
 
-    return jsonify({"zone": zone, "geo_context": geo_context, "results": results})
+    limited = results[:15]
+
+    return jsonify({"zone": zone, "geo_context": geo_context, "results": limited})
 
 
 if __name__ == "__main__":

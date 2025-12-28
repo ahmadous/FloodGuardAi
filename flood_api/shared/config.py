@@ -21,5 +21,5 @@ OPEN_METEO_URL = (
     "https://api.open-meteo.com/v1/forecast?"
     "latitude={lat}&longitude={lon}"
     "&hourly=temperature_2m,precipitation,relative_humidity_2m"
-    "&forecast_days=5&timezone=Africa%2FDakar"
+    "&forecast_days=15&timezone=Africa%2FDakar"
 )
