@@ -1,8 +1,32 @@
-# FloodGuardAI AI-Powered Early Flood Detection and Prediction System for Senegal 
--Live platform: https://sengaal-b4ab0.web.app/ 
--Results: Random Forest: AUC-ROC = 1.000, -
-Recall = 100% ConvNeXt-Tiny: F1-Score = 96.48%, zero false alerts 
--Master's thesis defended February 16, 2026 Université Iba Der Thiam de Thiès / Université de Technologie de Troyes Author: Papa Ahmadou Seydou SOW paseydou.sow@univ-thies.sn
+# FloodGuardAI 🌊🤖
+## AI-Powered Early Flood Detection and Prediction System for Senegal
+
+**Live platform:** https://sengaal-b4ab0.web.app/
+**Demo video:** https://youtu.be/ml16aAvDvzs
+
+## Results
+- Random Forest: AUC-ROC = 1.000 | Recall = 100% | Zero missed flood events
+- ConvNeXt-Tiny: F1-Score = 96.48% | Zero false alerts
+- Test set: 2,202 observations (2023–2025) across 6 Senegalese zones
+
+## Description
+FloodGuardAI combines machine learning and deep learning 
+to detect and predict floods in Senegal, integrating 
+citizen participation for real-time early warnings.
+
+## Academic Validation
+Master's thesis defended February 16, 2026
+Université Iba Der Thiam de Thiès (UIDT) / 
+Université de Technologie de Troyes (UTT)
+
+## Author
+Papa Ahmadou Seydou SOW
+paseydou.sow@univ-thies.sn
+Yaatal Digital — Senegal
+
+## Awards
+- WSIS Prizes 2026 — AL C7 E-environment
+- AI for Good Impact Awards 2026 — AI for Planet
 # Flood Monitoring Platform
 
 This repository now follows a microservice layout:
