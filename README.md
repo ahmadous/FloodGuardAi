@@ -1,4 +1,4 @@
-#FloodGuardAI AI-Powered Early Flood Detection and Prediction System for Senegal 
+# FloodGuardAI AI-Powered Early Flood Detection and Prediction System for Senegal 
 -Live platform: https://sengaal-b4ab0.web.app/ 
 -Results: Random Forest: AUC-ROC = 1.000, -
 Recall = 100% ConvNeXt-Tiny: F1-Score = 96.48%, zero false alerts 
