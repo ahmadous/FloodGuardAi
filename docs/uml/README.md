@@ -23,17 +23,14 @@ Ce diagramme présente l'architecture complète du système avec :
   - `APIGateway` : Point d'entrée unique (pattern Gateway)
   - `GeoBlueprint` : Gestion des endpoints géographiques
   - `ClassificationService` : Service de classification d'images (ResNet18)
-  - `ForecastService` : Service de prédiction météorologique (Random Forest)
 
 - **Shared Layer**
   - `ModelRegistry` : Chargement centralisé des modèles ML (pattern Singleton avec LRU cache)
-  - `ForecastEngine` : Moteur de calcul des prédictions
   - `GeoDataService` : Gestion des données géospatiales (shapefiles, geopackages)
   - `Config` : Configuration globale
 
 - **Machine Learning Models**
   - `ImageClassifier` : ResNet18 pré-entraîné
-  - `WeatherPredictor` : Random Forest pour prédiction
   - `Scaler` : Normalisation des features
 
 - **Frontend (Vue.js)**
@@ -46,7 +43,6 @@ Ce diagramme présente l'architecture complète du système avec :
 
 - L'API Gateway proxie vers les microservices
 - Les services utilisent ModelRegistry pour charger les modèles
-- Le ForecastEngine orchestre les prédictions
 - Le frontend communique uniquement avec l'API Gateway
 
 ---
@@ -86,7 +82,7 @@ Ce diagramme identifie les acteurs et leurs interactions avec le système.
 
 - **Gestion des Alertes** : Signalement et suivi par citoyens
 - **Détection par Image** : Classification automatique des inondations
-- **Prédiction Météorologique** : Prédictions manuelle, auto et batch
+- **Gestion des Alertes** : signalement, validation, traitement et suivi local
 - **Cartographie** : Visualisation zones à risque
 - **Administration** : Gestion locale et nationale
 

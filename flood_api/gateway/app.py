@@ -9,8 +9,15 @@ from flask_cors import CORS
 
 from flood_api.gateway.geo import geo_bp
  
-CLASSIFICATION_SERVICE_URL = os.getenv("CLASSIFICATION_SERVICE_URL", "http://localhost:5001")
-FORECAST_SERVICE_URL = os.getenv("FORECAST_SERVICE_URL", "http://localhost:5002")
+def _get_service_url(env_key: str, default: str) -> str:
+    raw = os.getenv(env_key, default)
+    value = (raw or "").strip()
+    if value and (value.startswith("http://") or value.startswith("https://")):
+        return value.rstrip("/")
+    return default
+
+
+CLASSIFICATION_SERVICE_URL = _get_service_url("CLASSIFICATION_SERVICE_URL", "http://localhost:5001")
 REQUEST_TIMEOUT = float(os.getenv("GATEWAY_TIMEOUT", "15"))
 
 
@@ -42,8 +49,7 @@ def create_app() -> Flask:
     @app.route("/health", methods=["GET"])
     def health() -> tuple[dict[str, Any], int]:
         classification, _ = _service_health(f"{CLASSIFICATION_SERVICE_URL}/health")
-        forecast, _ = _service_health(f"{FORECAST_SERVICE_URL}/health")
-        return {"classification": classification, "forecast": forecast}, 200
+        return {"classification": classification}, 200
 
     @app.route("/predict_class", methods=["POST"])
     def predict_class():
@@ -55,34 +61,6 @@ def create_app() -> Flask:
         files = {"file": (file.filename, file.stream, file.content_type)}
         return _proxy_json(f"{CLASSIFICATION_SERVICE_URL}/predict_class", files=files)
 
-    @app.route("/predict_meteo", methods=["POST"])
-    def proxy_predict_meteo():
-        return _proxy_json(
-            f"{FORECAST_SERVICE_URL}/predict_meteo",
-            payload=request.get_json(silent=True),
-        )
-
-    @app.route("/predict_meteo_manual", methods=["POST"])
-    def proxy_predict_meteo_manual():
-        return _proxy_json(
-            f"{FORECAST_SERVICE_URL}/predict_meteo_manual",
-            payload=request.get_json(silent=True),
-        )
-
-    @app.route("/predict_meteo_batch", methods=["POST"])
-    def proxy_predict_meteo_batch():
-        return _proxy_json(
-            f"{FORECAST_SERVICE_URL}/predict_meteo_batch",
-            payload=request.get_json(silent=True),
-        )
-
-    @app.route("/predict_meteo_auto", methods=["POST"])
-    def proxy_predict_meteo_auto():
-        return _proxy_json(
-            f"{FORECAST_SERVICE_URL}/predict_meteo_auto",
-            payload=request.get_json(silent=True),
-        )
-
     @app.route("/", methods=["GET"])
     def root() -> str:
         return "Flood API Gateway"
@@ -90,8 +68,8 @@ def create_app() -> Flask:
     return app
 
 
-app = create_app()
+gateway_app = create_app()
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    gateway_app.run(host="0.0.0.0", port=5000, debug=True)

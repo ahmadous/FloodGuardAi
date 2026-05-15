@@ -1,0 +1,31 @@
+# ─── render.yaml ──────────────────────────────────────────────────────────────
+# Blueprint Render.com pour Saytu Mbeund Backend.
+# Déploie le gateway. Le service de classification est externe.
+# ──────────────────────────────────────────────────────────────────────────────
+services:
+  - type: web
+    name: saytumbeund-latest
+    runtime: image
+    image:
+      url: docker.io/as1490/floodguardai:latest
+    # Région la plus proche de l'Afrique de l'Ouest disponible sur Render
+    region: frankfurt
+    plan: free
+
+    envVars:
+      # ── URL du service de classification (Hugging Face Spaces) ──────────────
+      # Remplacer par ta vraie URL HF Spaces après déploiement
+      - key: CLASSIFICATION_SERVICE_URL
+        value: https://passeydou-floodguard-classification.hf.space
+
+      # ── Timeout gateway vers les services internes ───────────────────────────
+      - key: GATEWAY_TIMEOUT
+        value: "30"
+
+      - key: PYTHONUNBUFFERED
+        value: "1"
+
+    healthCheckPath: /health
+
+    # Expose le port que Render assigne via $PORT
+    # (gunicorn lit $PORT dans start_render.sh)

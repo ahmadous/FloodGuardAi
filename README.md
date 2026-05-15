@@ -1,4 +1,4 @@
-# FloodGuardAI 🌊🤖
+# Saytu Mbeund 🌊🤖
 ## AI-Powered Early Flood Detection and Prediction System for Senegal
 
 **Live platform:** https://sengaal-b4ab0.web.app/
@@ -10,9 +10,7 @@
 - Test set: 2,202 observations (2023–2025) across 6 Senegalese zones
 
 ## Description
-FloodGuardAI combines machine learning and deep learning 
-to detect and predict floods in Senegal, integrating 
-citizen participation for real-time early warnings.
+Saytu Mbeund aide les citoyens et les autorités à signaler, suivre et coordonner les alertes d’inondation en temps réel.
 
 ## Academic Validation
 Master's thesis defended February 16, 2026
@@ -31,9 +29,8 @@ Yaatal Digital — Senegal
 
 This repository now follows a microservice layout:
 
-- **Classification Service (5001)** – image flood detection (`flood_api/services/classification_service`).
-- **Forecast Service (5002)** – weather driven flood scoring (`flood_api/services/forecast_service`).
-- **API Gateway (5000)** – single entry point forwarding requests to the services (`flood_api/gateway`).
+- **Classification Service (5001)** – détection d’inondations par image (`flood_api/services/classification_service`).
+- **API Gateway (5000)** – point d’entrée unique vers les services (`flood_api/gateway`).
 - **Frontend (5173)** – Vue 3 client served with Vite (`frontend`).
 
 ## Project structure
@@ -46,8 +43,7 @@ This repository now follows a microservice layout:
 │   ├── app.py                 # keeps local compatibility by booting the gateway
 │   ├── gateway/
 │   ├── services/
-│   │   ├── classification_service/
-│   │   └── forecast_service/
+│   │   └── classification_service/
 │   ├── shared/
 │   └── models/                # shared ML artefacts
 └── frontend
@@ -65,18 +61,17 @@ Services are exposed on:
 
 - `http://localhost:5000` (gateway)
 - `http://localhost:5001` (classification)
-- `http://localhost:5002` (forecast)
 - `http://localhost:5173` (frontend)
 
-Model files are mounted from `flood_api/models/`, so make sure the artefacts are present before launching the stack.
+Model files are mounted from `flood_api/models/`, so make sure the artefacts are present before launching the stack.  The classification service will automatically prefer `best_flood_model.pth` if it exists (this is the name produced by the training helper script); otherwise it falls back to the legacy `best_flood_classifier (1).pth`. You can also override any path with the `IMAGE_CLASSIFIER_PATH` environment variable.
 
-## Automatic alert workflow
+## Alert workflow
 
-- Le module de prévision automatique (`PredictAuto`) crée une alerte Firestore pour chaque jour détecté à risque et l’interface citoyenne affiche un résumé synthétique.
+- Les citoyens peuvent signaler une inondation depuis `/signaler`, avec ou sans photo, pour alimenter immédiatement le registre d’alertes.
 - La barre supérieure expose un bandeau d’urgence et une cloche d’alertes pointant vers le centre d’alertes (`/alertes`).
-- Le module `PredictAuto` affiche une synthèse des jours critiques (J+2, J+3, …) pour guider la prévention.
-- Les composants de détection image (`FloodClassify`, `DetectImage`) alimentent aussi automatiquement le registre d’alertes.
-- Le formulaire citoyen `/signaler` recommande la validation IA mais autorise l’envoi manuel pour ne pas bloquer les visiteurs.
+- Le système met l’accent sur la gestion des alertes actives, le suivi local et le traitement par les équipes municipales.
+- Les composants de détection image (`FloodClassify`, `DetectImage`) restent disponibles pour aider à prioriser les signalements visuels.
+- Le mode manuel permet aux responsables de valider et clore les alertes sans dépendre d’un modèle prédictif externe.
 
 ## Gestion des rôles
 
@@ -102,7 +97,6 @@ Run each backend service in its own terminal:
 ```bash
 cd flood_api
 python -m flood_api.services.classification_service.app
-python -m flood_api.services.forecast_service.app
 python -m flood_api.gateway.app
 ```
 
@@ -118,13 +112,12 @@ The frontend reads the service URLs from these environment variables:
 
 - `VITE_API_GATEWAY_URL`
 - `VITE_CLASSIFICATION_SERVICE_URL`
-- `VITE_FORECAST_SERVICE_URL`
 
-By default they fall back to `http://localhost:5000`, `http://localhost:5001` and `http://localhost:5002` respectively.
+By default they fall back to `http://localhost:5000` and `http://localhost:5001` respectively.
 
 ## Configuration notes
 
-- Gateway targets can be overridden with `CLASSIFICATION_SERVICE_URL`, `FORECAST_SERVICE_URL`, and optionally `GATEWAY_TIMEOUT`.
+- Gateway targets can be overridden with `CLASSIFICATION_SERVICE_URL` and optionally `GATEWAY_TIMEOUT`.
 - Global constants (image size, probability threshold, supported zones) live in `flood_api/shared/config.py`.
 
 ## Next steps

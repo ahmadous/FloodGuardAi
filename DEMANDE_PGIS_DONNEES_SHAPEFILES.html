@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demande de Données PGIIS — Saytu Mbeund</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Calibri', 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: white;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Header - Official letter style */
+        .header {
+            border-bottom: 3px solid #153452;
+            padding-bottom: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .logo-section {
+            display: grid;
+            grid-template-columns: 100px 1fr 100px;
+            gap: 1.5rem;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .logo {
+            font-size: 3rem;
+            text-align: center;
+        }
+
+        .project-info {
+            text-align: center;
+        }
+
+        .project-info h1 {
+            color: #153452;
+            font-size: 1.4rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .project-info p {
+            color: #0e9aa7;
+            font-size: 0.95rem;
+            margin: 0.2rem 0;
+        }
+
+        .date-sender {
+            text-align: right;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        /* Address blocks */
+        .address-block {
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .address-block strong {
+            color: #153452;
+        }
+
+        /* Main content */
+        h2 {
+            color: #153452;
+            border-bottom: 2px solid #0e9aa7;
+            padding-bottom: 0.5rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.8rem;
+            font-size: 1.2rem;
+        }
+
+        h3 {
+            color: #0e9aa7;
+            margin-top: 1.2rem;
+            margin-bottom: 0.6rem;
+            font-size: 1.05rem;
+        }
+
+        p {
+            text-align: justify;
+            margin-bottom: 0.8rem;
+        }
+
+        /* Lists */
+        ul, ol {
+            margin-left: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        li {
+            margin-bottom: 0.6rem;
+            text-align: justify;
+        }
+
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            background: white;
+        }
+
+        table th {
+            background: #153452;
+            color: white;
+            padding: 0.8rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        table td {
+            padding: 0.8rem;
+            border-bottom: 1px solid #ddd;
+        }
+
+        table tr:nth-child(even) {
+            background: #f9fbff;
+        }
+
+        /* Boxes */
+        .box {
+            border-left: 4px solid #0e9aa7;
+            padding: 1.2rem;
+            margin: 1.5rem 0;
+            background: #f9fbff;
+            border-radius: 4px;
+        }
+
+        .box.important {
+            border-left-color: #ff6b6b;
+            background: #fff5f5;
+        }
+
+        /* Signature area */
+        .signature-area {
+            margin-top: 2.5rem;
+            padding-top: 2rem;
+            border-top: 1px solid #ddd;
+        }
+
+        .signature-block {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            margin-top: 2rem;
+        }
+
+        .sig-item {
+            text-align: center;
+        }
+
+        .sig-line {
+            border-top: 1px solid #333;
+            margin-top: 3rem;
+            padding-top: 0.5rem;
+            font-size: 0.9rem;
+            color: #333;
+        }
+
+        /* Contact info */
+        .contact-info {
+            background: #f0f4f8;
+            padding: 1.2rem;
+            border-radius: 4px;
+            margin-top: 2rem;
+        }
+
+        .contact-info h3 {
+            margin-top: 0;
+        }
+
+        .contact-line {
+            margin: 0.5rem 0;
+            font-size: 0.95rem;
+        }
+
+        /* Print styles */
+        @media print {
+            body {
+                margin: 0;
+                padding: 0;
+            }
+            .container {
+                padding: 0;
+            }
+            .page-break {
+                page-break-after: always;
+                margin-bottom: 2rem;
+            }
+            h2 {
+                page-break-after: avoid;
+            }
+            table {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo-section">
+                <div class="logo">🌊</div>
+                <div class="project-info">
+                    <h1>Saytu Mbeund</h1>
+                    <p>Système d'Alerte aux Inondations</p>
+                    <p style="font-size: 0.85rem;">En Temps Réel pour le Sénégal</p>
+                </div>
+                <div class="logo">🇸🇳</div>
+            </div>
+
+            <div class="date-sender">
+                Dakar, le 14 mai 2026
+            </div>
+        </div>
+
+        <!-- Recipient -->
+        <div class="address-block">
+            <strong>À l'attention de :</strong><br>
+            Plan de Gestion Intégrée des Inondations (PGIIS)<br>
+            République du Sénégal<br>
+            Ministère de l'Hydraulique et de l'Assainissement
+        </div>
+
+        <!-- Subject -->
+        <div style="margin-bottom: 1.5rem; padding: 1rem; background: #f0f4f8; border-left: 4px solid #153452;">
+            <strong style="color: #153452;">Objet :</strong> Demande de partage des cartes des zones inondables — Projet Saytu Mbeund
+        </div>
+
+        <!-- Introduction -->
+        <h2>1. Présentation du projet Saytu Mbeund</h2>
+
+        <p>
+            Saytu Mbeund est un <strong>système national d'alerte aux inondations en temps réel</strong> créé pour protéger les populations du Sénégal. Le projet permet à :
+        </p>
+
+        <ul>
+            <li>Les <strong>citoyens</strong> de faire des signalements lors d'une inondation</li>
+            <li>Les <strong>habitants</strong> de recevoir une alerte immédiate (téléphone, email, SMS)</li>
+            <li>Les <strong>autorités locales</strong> de prendre des décisions rapides</li>
+            <li>Les <strong>chercheurs</strong> d'étudier où et quand les inondations arrivent</li>
+        </ul>
+
+        <p style="margin-top: 1rem;">
+            <strong>Le système est actuellement opérationnel</strong> avec une application mobile que les gens peuvent utiliser maintenant.
+        </p>
+
+        <!-- Why PGIIS data -->
+        <h2>2. Pourquoi nous avons besoin des cartes du PGIIS</h2>
+
+        <p>
+            Le PGIIS a travaillé pendant des années pour créer les cartes des <strong>zones inondables au Sénégal</strong>. Ces cartes sont essentielles.
+        </p>
+
+        <p>
+            Si nous avons ces cartes, Saytu Mbeund peut :
+        </p>
+
+        <div class="box">
+            <ul>
+                <li>✅ Informer les habitants des <strong>zones à risque d'inondation</strong> toute l'année</li>
+                <li>✅ Aider les autorités à <strong>valider si un signalement se situe dans une zone inondable</strong></li>
+                <li>✅ Alerter les populations <strong>avant la saison des pluies</strong> si leur habitation est en zone à risque</li>
+                <li>✅ Croiser les signalements d'inondation avec <strong>les zones inondables officielles</strong></li>
+                <li>✅ Aider les chercheurs à <strong>identifier les patterns d'inondation</strong> (zones récurrentes, saisonnalité, facteurs)</li>
+            </ul>
+        </div>
+
+        <!-- Data request -->
+        <h2>3. Les cartes qu'on demande</h2>
+
+        <p>
+            Pour faire fonctionner le projet au mieux, nous avons besoin que le PGIIS nous partage ses cartes pour :
+        </p>
+
+        <h3>A. Les zones inondables principales (TRÈS IMPORTANT)</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Type de carte</th>
+                    <th>Description</th>
+                    <th>Exemples</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Zones à risque fréquent (récurrence 10 ans)</strong></td>
+                    <td>Les zones les plus vulnérables. Inondation régulière.</td>
+                    <td>Certains quartiers de Dakar, Thiès, Saint-Louis, etc.</td>
+                </tr>
+                <tr>
+                    <td><strong>Zones à risque moyen (récurrence 50 ans)</strong></td>
+                    <td>Zones moins fréquentes mais vulnérables</td>
+                    <td>Zones autour des fleuves principaux</td>
+                </tr>
+                <tr>
+                    <td><strong>Zones à risque faible (récurrence 100 ans)</strong></td>
+                    <td>Zones exposées mais moins fréquemment inondées</td>
+                    <td>Certaines régions côtières, zones humides</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>B. Les ressources d'eau (IMPORTANT)</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Type de carte</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Les rivières et fleuves</strong></td>
+                    <td>Sénégal, Niger, Casamance, tous les grands cours d'eau</td>
+                </tr>
+                <tr>
+                    <td><strong>Les lacs et retenues permanentes</strong></td>
+                    <td>Lacs Guiers, Retba, autres retenues permanentes</td>
+                </tr>
+                <tr>
+                    <td><strong>Les mares et zones humides temporaires</strong></td>
+                    <td>Points d'eau qui disparaissent en saison sèche</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>C. Les zones administratives (IMPORTANT)</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Type de carte</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Les régions</strong></td>
+                    <td>Les 14 régions du Sénégal</td>
+                </tr>
+                <tr>
+                    <td><strong>Les départements et districts</strong></td>
+                    <td>Les subdivisions des régions</td>
+                </tr>
+                <tr>
+                    <td><strong>Les communes</strong></td>
+                    <td>Les communes pour localisation précise</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- How to deliver -->
+        <h2>4. Comment nous envoyer les cartes</h2>
+
+        <h3>Format de livraison :</h3>
+
+        <ul>
+            <li>Les cartes que vous avez (format n'importe peu)</li>
+            <li>En fichier ZIP ou dossier compressé</li>
+            <li>Avec une description simple (quoi c'est, quand, où ça couvre)</li>
+        </ul>
+
+        <h3>Composition du dossier :</h3>
+
+        <div style="background: #f5f5f5; padding: 1rem; border-radius: 4px; margin: 1rem 0;">
+            <strong>Dossier PGIIS_Cartes_Saytu_Mbeund/</strong><br><br>
+            ├─ Zones inondables (tous les fichiers du PGIIS pour ces zones)<br>
+            ├─ Rivières et fleuves (tous les fichiers PGIIS)<br>
+            ├─ Lacs et retenues (tous les fichiers PGIIS)<br>
+            ├─ Régions (tous les fichiers PGIIS)<br>
+            ├─ Départements/Districts (tous les fichiers PGIIS)<br>
+            ├─ Communes (tous les fichiers PGIIS)<br>
+            └─ <strong>INFORMATIONS.txt</strong> (voir ci-dessous)
+        </div>
+
+        <h3>Fichier d'informations à inclure :</h3>
+
+        <p>Un simple fichier texte nommé <code>INFORMATIONS.txt</code> avec :</p>
+
+        <ul>
+            <li>Qui a fait les cartes (PGIIS, quelle équipe)</li>
+            <li>Quand (année de création/dernière mise à jour)</li>
+            <li>Chaque carte : à quoi elle sert, ce qu'elle montre</li>
+            <li>Est-ce qu'on peut les partager librement ou pas</li>
+        </ul>
+
+        <!-- Usage and commitment -->
+        <h2>5. Nos engagements</h2>
+
+        <div class="box">
+            <h3 style="margin-top: 0;">Saytu Mbeund promet de :</h3>
+
+            <ul>
+                <li>✅ <strong>Utiliser les cartes UNIQUEMENT</strong> pour l'alerte inondations</li>
+                <li>✅ <strong>Remercier le PGIIS</strong> dans l'application et dans tous les documents</li>
+                <li>✅ <strong>Ne jamais les utiliser</strong> à d'autres fins ou les donner à d'autres</li>
+                <li>✅ <strong>Sécuriser les cartes</strong> correctement</li>
+                <li>✅ <strong>Informer le PGIIS</strong> quand nouvelles cartes trouvées ou erreurs découvertes</li>
+                <li>✅ <strong>Donner accès au PGIIS</strong> à tous les signalements citoyens (pour validation)</li>
+            </ul>
+        </div>
+
+        <!-- Timeline -->
+        <h2>6. Quand on en a besoin</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Étape</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>14 mai 2026</strong></td>
+                    <td>Envoi de cette demande</td>
+                </tr>
+                <tr>
+                    <td><strong>30 mai 2026</strong></td>
+                    <td>Vous confirmez que vous pouvez partager les cartes</td>
+                </tr>
+                <tr>
+                    <td><strong>30 juin 2026</strong></td>
+                    <td>Vous envoyez les cartes</td>
+                </tr>
+                <tr>
+                    <td><strong>15 juillet 2026</strong></td>
+                    <td>On les met dans l'application</td>
+                </tr>
+                <tr>
+                    <td><strong>30 juillet 2026</strong></td>
+                    <td>Test avec les maires et autorités</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Contact -->
+        <h2>7. Comment nous contacter</h2>
+
+        <div class="contact-info">
+            <h3 style="margin-top: 0;">📧 Pour envoyer les cartes ou poser des questions :</h3>
+            <div class="contact-line">
+                <strong>Email :</strong> paseydou.sow@univ-thies.sn
+            </div>
+            <div class="contact-line">
+                <strong>Sujet du mail :</strong> "Cartes PGIIS pour Saytu Mbeund"
+            </div>
+            <div class="contact-line">
+                <strong>Taille :</strong> Aucun problème si c'est gros (50-200 MB), envoyez par email ou lien cloud
+            </div>
+        </div>
+
+        <!-- Importance -->
+        <h2>8. Pourquoi c'est important</h2>
+
+        <div class="box important">
+            <p>
+                <strong>Saytu Mbeund peut vraiment aider à sauver des vies au Sénégal.</strong>
+            </p>
+
+            <p style="margin-top: 1rem;">
+                Si le PGIIS partage ses cartes avec nous :
+            </p>
+
+            <ul>
+                <li>Chaque habitant en zone à risque sera alerté immédiatement</li>
+                <li>Les maires pourront mieux gérer les inondations</li>
+                <li>Les services d'urgence réagiront plus vite</li>
+                <li>Les chercheurs comprendront mieux le problème</li>
+                <li>Le Sénégal aura un système national de référence</li>
+            </ul>
+        </div>
+
+        <!-- Closing -->
+        <h2>9. Conclusion</h2>
+
+        <p>
+            Le PGIIS a fait un excellent travail pour cartographier les zones inondables au Sénégal. Ces cartes méritent d'être utilisées pour protéger les gens.
+        </p>
+
+        <p>
+            Nous demandons respectueusement au PGIIS de <strong>partager ces cartes avec Saytu Mbeund</strong> pour que le système puisse fonctionner pleinement et aider vraiment les Sénégalais.
+        </p>
+
+        <!-- Signature -->
+        <div class="signature-area">
+            <p>
+                En vous remerciant par avance pour votre collaboration précieuse, nous vous prions d'agréer l'expression de notre haute considération.
+            </p>
+
+            <div class="signature-block">
+                <div class="sig-item">
+                    <div style="margin-bottom: 4rem;"></div>
+                    <div class="sig-line">
+                        Équipe Saytu Mbeund<br>
+                        Université Thiès<br>
+                        Sénégal
+                    </div>
+                </div>
+                <div class="sig-item">
+                    <div style="margin-bottom: 4rem;"></div>
+                    <div class="sig-line">
+                        _________________<br>
+                        Signature/Cachet
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Appendix -->
+        <div class="page-break" style="margin-top: 2rem; padding-top: 2rem; border-top: 2px solid #ddd;">
+            <h2>📎 Ce qu'on va faire avec vos cartes</h2>
+
+            <h3>Utilisation sur la carte interactive</h3>
+
+            <p>
+                Quand quelqu'un ouvre l'application Saytu Mbeund, il verra la carte du Sénégal avec :
+            </p>
+
+            <ul>
+                <li>Les <strong>zones en rouge</strong> = Inondent souvent (très à risque)</li>
+                <li>Les <strong>zones en orange</strong> = Inondent parfois (risque modéré)</li>
+                <li>Les <strong>zones en jaune</strong> = Inondent rarement (risque bas)</li>
+                <li>Les <strong>rivières et lacs</strong> = Pour voir les ressources d'eau</li>
+            </ul>
+
+            <h3>Utilisation pour les signalements</h3>
+
+            <p>
+                Quand quelqu'un signale une inondation, le système :
+            </p>
+
+            <ul>
+                <li>Vérifie si le signalement est dans une zone PGIIS</li>
+                <li>Aide à vérifier que c'est vraiment une inondation</li>
+                <li>Alerte les habitants et autorités de cette zone</li>
+            </ul>
+
+            <h3>Utilisation pour la recherche</h3>
+
+            <p>
+                Les chercheurs pourront analyser :
+            </p>
+
+            <ul>
+                <li>Où inondations réelles vs cartes PGIIS</li>
+                <li>Évolution des zones à risque</li>
+                <li>Périodes d'inondations (saison, fréquence)</li>
+            </ul>
+
+            <h2>À propos de Saytu Mbeund</h2>
+
+            <p>
+                Saytu Mbeund (qui signifie "sauve une vie" en wolof) est une application créée par des chercheurs et ingénieurs sénégalais pour protéger les populations contre les inondations.
+            </p>
+
+            <p>
+                Les habitants peuvent :
+            </p>
+
+            <ul>
+                <li>📱 Signaler une inondation quand ils la voient</li>
+                <li>🔔 Recevoir une alerte immédiate par téléphone</li>
+                <li>📧 Recevoir des informations par email</li>
+                <li>📲 Recevoir des SMS si besoin</li>
+                <li>🗺️ Voir les zones à risque sur une carte</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

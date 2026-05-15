@@ -10,17 +10,6 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
 
-  forecast-service:
-    build:
-      context: ./flood_api
-      dockerfile: services/forecast_service/Dockerfile
-    ports:
-      - "5002:5002"
-    volumes:
-      - ./flood_api/models:/app/flood_api/models
-    environment:
-      - PYTHONUNBUFFERED=1
-
   api-gateway:
     build:
       context: ./flood_api
@@ -29,11 +18,9 @@ services:
       - "5000:5000"
     environment:
       - CLASSIFICATION_SERVICE_URL=http://classification-service:5001
-      - FORECAST_SERVICE_URL=http://forecast-service:5002
       - PYTHONUNBUFFERED=1
     depends_on:
       - classification-service
-      - forecast-service
 
   frontend:
     build:
@@ -43,6 +30,5 @@ services:
     environment:
       - VITE_API_GATEWAY_URL=http://localhost:5000
       - VITE_CLASSIFICATION_SERVICE_URL=http://localhost:5001
-      - VITE_FORECAST_SERVICE_URL=http://localhost:5002
     depends_on:
       - api-gateway

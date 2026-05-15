@@ -1,13 +1,8 @@
 from __future__ import annotations
 
-import json
 import os
-from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
-from typing import Tuple
-
-from joblib import load
 
 from .config import CLASS_NAMES, IMG_SIZE, MODELS_DIR
 
@@ -86,27 +81,6 @@ def load_image_classifier() -> torch.nn.Module:
     model.to(_DEVICE)
     model.eval()
     return model
-
-
-@lru_cache(maxsize=1)
-def load_weather_artifacts() -> "WeatherArtifacts":
-    model_path = MODELS_DIR / "random_forest_predict_model.pkl"
-    scaler_path = MODELS_DIR / "scaler_predict.pkl"
-    metadata_path = MODELS_DIR / "flood_predict_metadata.json"
-
-    rf_model = load(model_path)
-    scaler = load(scaler_path)
-    metadata = {}
-    if metadata_path.exists():
-        metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
-    return WeatherArtifacts(model=rf_model, scaler=scaler, metadata=metadata)
-
-
-@dataclass(frozen=True)
-class WeatherArtifacts:
-    model: object
-    scaler: object
-    metadata: dict
 
 
 def _ensure_torch_available(caller: str) -> None:

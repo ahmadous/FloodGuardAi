@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rapport Saytu Mbeund — Améliorations Récentes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.8;
+            color: #333;
+            background: white;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #153452 0%, #0e9aa7 100%);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+        }
+
+        .header .subtitle {
+            font-size: 0.95rem;
+            opacity: 0.85;
+            font-style: italic;
+        }
+
+        /* Main content */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Sections */
+        h2 {
+            color: white;
+            background: linear-gradient(135deg, #153452 0%, #0e9aa7 100%);
+            padding: 1rem 1.5rem;
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            font-size: 1.5rem;
+        }
+
+        h3 {
+            color: #153452;
+            margin-top: 1.5rem;
+            margin-bottom: 0.8rem;
+            font-size: 1.2rem;
+            border-left: 5px solid #0e9aa7;
+            padding-left: 1rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            font-size: 1rem;
+            line-height: 1.8;
+        }
+
+        /* Boxes */
+        .box {
+            border-left: 5px solid #0e9aa7;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            background: #f0f4f8;
+            border-radius: 8px;
+        }
+
+        .box.highlight {
+            border-left-color: #ff6b6b;
+            background: #fff5f5;
+        }
+
+        .box.success {
+            border-left-color: #51cf66;
+            background: #f1fce4;
+        }
+
+        .box.warning {
+            border-left-color: #ffa500;
+            background: #fff9f0;
+        }
+
+        .box h4 {
+            color: #153452;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Lists */
+        ul, ol {
+            margin-left: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        li {
+            margin-bottom: 0.8rem;
+            font-size: 1rem;
+        }
+
+        /* Cards */
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .card {
+            background: white;
+            border: 2px solid #e0e6f0;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: #0e9aa7;
+            box-shadow: 0 8px 20px rgba(14, 154, 167, 0.15);
+        }
+
+        .card .emoji {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .card h4 {
+            color: #153452;
+            margin-bottom: 0.5rem;
+        }
+
+        .card p {
+            margin: 0;
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        /* Timeline */
+        .timeline {
+            margin: 2rem 0;
+        }
+
+        .timeline-item {
+            display: flex;
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-left: 3px solid #0e9aa7;
+            padding-left: 2rem;
+            margin-left: 1rem;
+        }
+
+        .timeline-item:last-child {
+            border-left-color: #51cf66;
+        }
+
+        .timeline-date {
+            font-weight: 700;
+            color: #153452;
+            margin-bottom: 0.3rem;
+        }
+
+        .timeline-title {
+            font-size: 1.05rem;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-desc {
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        /* Benefits */
+        .benefits {
+            background: #f0f4f8;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .benefit-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .benefit-emoji {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .benefit-text {
+            font-size: 0.95rem;
+            color: #333;
+            font-weight: 600;
+        }
+
+        /* What's needed */
+        .needed {
+            background: #fff9f0;
+            border: 2px solid #ffa500;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+        }
+
+        .needed h4 {
+            color: #ff6b00;
+            margin-bottom: 1rem;
+        }
+
+        .needed ol {
+            margin-left: 1.5rem;
+        }
+
+        .needed li {
+            margin-bottom: 0.8rem;
+        }
+
+        /* Steps */
+        .steps {
+            margin: 1.5rem 0;
+        }
+
+        .step {
+            background: white;
+            border: 1px solid #e0e6f0;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid #0e9aa7;
+        }
+
+        .step-number {
+            display: inline-block;
+            background: #0e9aa7;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 40px;
+            font-weight: 700;
+            margin-right: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .step h4 {
+            display: inline;
+            color: #153452;
+            margin: 0;
+        }
+
+        /* Comparison */
+        .comparison {
+            margin: 1.5rem 0;
+        }
+
+        .comparison-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .comparison-box {
+            padding: 1rem;
+            border-radius: 6px;
+        }
+
+        .comparison-before {
+            background: #ffebee;
+            border-left: 4px solid #ff6b6b;
+        }
+
+        .comparison-after {
+            background: #f1fce4;
+            border-left: 4px solid #51cf66;
+        }
+
+        .comparison-label {
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            color: #666;
+        }
+
+        .comparison-text {
+            font-size: 1rem;
+            color: #333;
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 3rem;
+            padding: 2rem;
+            background: #f0f4f8;
+            text-align: center;
+            border-radius: 8px;
+            color: #666;
+        }
+
+        footer p {
+            margin: 0.3rem;
+        }
+
+        /* Page break for print */
+        @media print {
+            .page-break {
+                page-break-after: always;
+            }
+            body {
+                background: white;
+            }
+            h2 {
+                page-break-after: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>🌊 Saytu Mbeund</h1>
+        <p>Système d'Alerte aux Inondations en Temps Réel</p>
+        <div class="subtitle">Rapport simplifié — Ce qui a changé en mai 2026</div>
+    </div>
+
+    <div class="container">
+        <!-- Introduction -->
+        <h2>📌 Résumé rapide</h2>
+
+        <div class="box success">
+            <h4>✅ Ce qui a été fait</h4>
+            <p>Pendant deux semaines (7-14 mai), l'équipe a travaillé sur l'apparence de l'application et sur un système pour alerter les gens par téléphone, email et SMS quand une inondation est signalée.</p>
+        </div>
+
+        <!-- Section 1: Visual improvements -->
+        <h2>1. 🎨 L'application est plus belle et facile à utiliser</h2>
+
+        <h3>Avant et après</h3>
+
+        <div class="comparison-row">
+            <div class="comparison-box comparison-before">
+                <div class="comparison-label">❌ Avant (7 mai)</div>
+                <div class="comparison-text">
+                    • Couleurs pas cohérentes<br>
+                    • Texte invisible sur certains fonds<br>
+                    • Chargement lent des alertes<br>
+                    • Pas facile de naviguer
+                </div>
+            </div>
+            <div class="comparison-box comparison-after">
+                <div class="comparison-label">✅ Après (14 mai)</div>
+                <div class="comparison-text">
+                    • Couleurs uniformes et professionnelles<br>
+                    • Tous les textes lisibles<br>
+                    • Chargement rapide avec animations<br>
+                    • Navigation fluide et claire
+                </div>
+            </div>
+        </div>
+
+        <h3>Détails des améliorations</h3>
+
+        <div class="cards">
+            <div class="card">
+                <div class="emoji">🌙</div>
+                <h4>Mode jour/nuit</h4>
+                <p>L'app s'adapte automatiquement à la luminosité de votre écran. Les couleurs restent toujours visibles.</p>
+            </div>
+
+            <div class="card">
+                <div class="emoji">⚡</div>
+                <h4>Chargement plus rapide</h4>
+                <p>Les listes d'alertes s'affichent instantanément avec une animation de chargement fluide.</p>
+            </div>
+
+            <div class="card">
+                <div class="emoji">🔍</div>
+                <h4>Filtres et pagination</h4>
+                <p>Trouvez facilement une alerte avec les filtres (par date ou status) et la pagination par page.</p>
+            </div>
+
+            <div class="card">
+                <div class="emoji">📱</div>
+                <h4>Navigation mobile améliorée</h4>
+                <p>Le menu du bas est maintenant clair avec les bons liens et fonctionne sur tous les téléphones.</p>
+            </div>
+        </div>
+
+        <!-- Section 2: Notifications -->
+        <h2 class="page-break">2. 🔔 Un système pour alerter tout le monde</h2>
+
+        <p>Quand quelqu'un signale une inondation, on peut maintenant alerter <strong>automatiquement</strong> les citoyens par trois canaux :</p>
+
+        <div class="cards">
+            <div class="card">
+                <div class="emoji">📱</div>
+                <h4>Notification téléphone</h4>
+                <p><strong>Instantanée (5-10 secondes)</strong><br>Les gens reçoivent une notification sur leur téléphone/navigateur.<br><em>Gratuit, illimité</em></p>
+            </div>
+
+            <div class="card">
+                <div class="emoji">📧</div>
+                <h4>Email</h4>
+                <p><strong>Dans les 2-5 minutes</strong><br>Un email détaillé avec toutes les informations de l'alerte.<br><em>3000 emails/mois gratuit</em></p>
+            </div>
+
+            <div class="card">
+                <div class="emoji">📲</div>
+                <h4>SMS</h4>
+                <p><strong>Dans les 10-30 secondes</strong><br>Un SMS court et rapide sur les téléphones Sénégal.<br><em>Gratuit pour les tests</em></p>
+            </div>
+        </div>
+
+        <h3>Comment ça marche ?</h3>
+
+        <div class="timeline">
+            <div class="timeline-item">
+                <div>
+                    <div class="timeline-date">Étape 1 — Quelqu'un signale</div>
+                    <div class="timeline-title">Un citoyen soumet une alerte</div>
+                    <div class="timeline-desc">Il remplit le formulaire "Signaler une inondation" avec la localisation et la description.</div>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div>
+                    <div class="timeline-date">Étape 2 — Système détecte</div>
+                    <div class="timeline-title">L'alerte est enregistrée</div>
+                    <div class="timeline-desc">L'application sauvegarde l'alerte dans sa base de données.</div>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div>
+                    <div class="timeline-date">Étape 3 — Envoi automatique</div>
+                    <div class="timeline-title">Les notifications partent</div>
+                    <div class="timeline-desc">Le système envoie automatiquement des alertes push, emails et SMS à tous ceux qui se sont inscrits.</div>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div>
+                    <div class="timeline-date">Étape 4 — Les gens reçoivent</div>
+                    <div class="timeline-title">Information en temps réel</div>
+                    <div class="timeline-desc">Les citoyens, autorités et services d'urgence reçoivent l'alerte quasi-immédiatement.</div>
+                </div>
+            </div>
+        </div>
+
+        <h3>Qui reçoit quoi ?</h3>
+
+        <div class="comparison-row">
+            <div class="comparison-box" style="background: #f0f4f8; border-left: 4px solid #0e9aa7;">
+                <div class="comparison-label">👥 Citoyens</div>
+                <div class="comparison-text">
+                    • Notification téléphone<br>
+                    • Email<br>
+                    • SMS (optionnel)
+                </div>
+            </div>
+            <div class="comparison-box" style="background: #f0f4f8; border-left: 4px solid #0e9aa7;">
+                <div class="comparison-label">🏛️ Autorités & Mairies</div>
+                <div class="comparison-text">
+                    • Email détaillé<br>
+                    • SMS urgent<br>
+                    • Notification tableau de bord
+                </div>
+            </div>
+        </div>
+
+        <h3>Comment on contrôle les notifications ?</h3>
+
+        <p>Chaque personne peut choisir comment elle veut être alertée. Dans le profil ("/Profil"), il y a une section "Préférences de notification" avec des boutons pour :</p>
+
+        <ul>
+            <li>🔔 Activer/désactiver les notifications téléphone</li>
+            <li>📧 Activer/désactiver les emails</li>
+            <li>📱 Activer/désactiver les SMS et ajouter son numéro</li>
+        </ul>
+
+        <!-- Section 3: PGIIS Data -->
+        <h2 class="page-break">3. 🗺️ Les données qu'on attend du PGIIS</h2>
+
+        <div class="box warning">
+            <h4>⚠️ Important</h4>
+            <p>Le PGIIS (Plan de Gestion Intégrée des Inondations) dispose de cartes des zones inondables au Sénégal. Ces cartes sont nécessaires pour améliorer le système.</p>
+        </div>
+
+        <h3>Quelles cartes ?</h3>
+
+        <div class="cards">
+            <div class="card">
+                <div class="emoji">🌊</div>
+                <h4>Zones inondables</h4>
+                <p>Les zones inondables (fleuves Sénégal, Niger, Casamance, lacs, zones humides, etc)</p>
+            </div>
+
+            <div class="card">
+                <div class="emoji">💧</div>
+                <h4>Rivières</h4>
+                <p>Le réseau des rivières et fleuves du Sénégal</p>
+            </div>
+
+            <div class="card">
+                <div class="emoji">🏘️</div>
+                <h4>Zones administratives</h4>
+                <p>Les régions, districts et communes pour mieux filtrer les alertes</p>
+            </div>
+
+            <div class="card">
+                <div class="emoji">🏔️</div>
+                <h4>Élévation du terrain</h4>
+                <p>La hauteur du terrain pour comprendre l'écoulement de l'eau</p>
+            </div>
+        </div>
+
+        <h3>À qui demander ces données ?</h3>
+
+        <ul>
+            <li><strong>PGIIS Sénégal</strong> — Plan de Gestion Intégrée des Inondations (organisation principale)</li>
+            <li><strong>ANACIM</strong> — Pour les données météo et pluie</li>
+            <li><strong>ONAS</strong> — Pour le réseau hydrographique (rivières)</li>
+            <li><strong>IGN</strong> — Institut Géographique National (cartes générales)</li>
+        </ul>
+
+        <!-- Section 4: Using PGIIS data -->
+        <h2>4. 💡 Comment on va utiliser ces cartes</h2>
+
+        <h3>Sur la carte interactive</h3>
+
+        <p>Quand l'utilisateur ouvre la carte publique, il pourra voir :</p>
+
+        <ul>
+            <li><strong>Zones en rouge</strong> = zones inondables à risque fréquent (récurrence 10 ans)</li>
+            <li><strong>Zones en orange</strong> = zones inondables à risque moyen (récurrence 50 ans)</li>
+            <li><strong>Zones en jaune</strong> = zones inondables à risque faible (récurrence 100 ans)</li>
+            <li><strong>Les rivières et lacs</strong> = ressources d'eau principales</li>
+        </ul>
+
+        <p>En cliquant sur une zone, on verra :</p>
+
+        <ul>
+            <li>Le nom de la zone</li>
+            <li>La région et commune</li>
+            <li>Combien de gens habitent là</li>
+            <li>Les alertes récentes signalées dans cette zone</li>
+        </ul>
+
+        <div class="box">
+            <h4>Exemple</h4>
+            <p>Un citoyen à Dakar ouvre la carte et voit que sa rue est en zone rouge (inonde souvent). Il va être plus vigilant pendant la saison des pluies.</p>
+        </div>
+
+        <!-- Section 5: Smart alerts -->
+        <h2 class="page-break">5. 🧠 Un système intelligent pour détecter les vraies inondations</h2>
+
+        <h3>Le problème</h3>
+
+        <p>Parfois, quelqu'un signale une inondation mais c'est juste une flaque ou de l'eau qui va partir vite. Comment être sûr que c'est une VRAIE inondation ?</p>
+
+        <h3>La solution : Attendre confirmation</h3>
+
+        <div class="flowchart" style="background: #f0f4f8; padding: 2rem; border-radius: 8px; text-align: center; margin: 1.5rem 0;">
+            <div style="font-weight: bold; margin-bottom: 1rem;">Comment ça marche :</div>
+            <div style="display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                <div style="background: white; padding: 1rem 1.5rem; border: 2px solid #0e9aa7; border-radius: 6px;">
+                    <strong>Alerte 1 reçue</strong><br>
+                    <span style="font-size: 0.9rem; color: #666;">Quelqu'un signale</span>
+                </div>
+                <div style="font-size: 1.5rem; color: #0e9aa7;">→</div>
+                <div style="background: white; padding: 1rem 1.5rem; border: 2px solid #ffa500; border-radius: 6px;">
+                    <strong>Attendre 3h</strong><br>
+                    <span style="font-size: 0.9rem; color: #666;">Voir si ça empire</span>
+                </div>
+                <div style="font-size: 1.5rem; color: #0e9aa7;">→</div>
+                <div style="background: white; padding: 1rem 1.5rem; border: 2px solid #51cf66; border-radius: 6px;">
+                    <strong>Alerte 2 reçue</strong><br>
+                    <span style="font-size: 0.9rem; color: #666;">= Vraie inondation</span>
+                </div>
+            </div>
+        </div>
+
+        <h3>Exemple concret</h3>
+
+        <div class="timeline">
+            <div class="timeline-item">
+                <div>
+                    <div class="timeline-date">8h00</div>
+                    <div class="timeline-title">Première alerte</div>
+                    <div class="timeline-desc">Mamadou signale : "Eau dans la rue Thiès à Dakar" → Status = "À vérifier"</div>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div>
+                    <div class="timeline-date">8h - 11h</div>
+                    <div class="timeline-title">Attendre</div>
+                    <div class="timeline-desc">Le système attend 3 heures. Est-ce que d'autres personnes signalent la même zone ?</div>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div>
+                    <div class="timeline-date">10h30</div>
+                    <div class="timeline-title">Deuxième alerte</div>
+                    <div class="timeline-desc">Aïssatou signale aussi : "Route inondée rue Thiès" → Status = "CONFIRMÉE"</div>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div>
+                    <div class="timeline-date">10h30+</div>
+                    <div class="timeline-title">Action immédiate</div>
+                    <div class="timeline-desc">Alerte rouge aux autorités, SMS d'urgence, plan d'action pour éviter la zone</div>
+                </div>
+            </div>
+        </div>
+
+        <h3>Avantages</h3>
+
+        <div class="benefits">
+            <div class="benefits-grid">
+                <div class="benefit-item">
+                    <div class="benefit-emoji">✅</div>
+                    <div class="benefit-text">Moins de fausses alertes</div>
+                </div>
+                <div class="benefit-item">
+                    <div class="benefit-emoji">🎯</div>
+                    <div class="benefit-text">Alertes plus fiables</div>
+                </div>
+                <div class="benefit-item">
+                    <div class="benefit-emoji">🤝</div>
+                    <div class="benefit-text">Les citoyens s'entraident</div>
+                </div>
+                <div class="benefit-item">
+                    <div class="benefit-emoji">⏰</div>
+                    <div class="benefit-text">Réaction plus rapide</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 6: What's needed -->
+        <h2 class="page-break">6. 📋 Ce qu'on doit faire maintenant</h2>
+
+        <div class="needed">
+            <h4>🔴 Immédiatement (cette semaine)</h4>
+            <ol>
+                <li><strong>Clés d'accès techniques</strong> — Créer des accès pour envoyer les notifications</li>
+                <li><strong>Déploiement</strong> — Mettre en ligne le système de notifications</li>
+                <li><strong>Tests</strong> — Vérifier que tout marche (notifications reçues ?)</li>
+            </ol>
+        </div>
+
+        <div class="box warning">
+            <h4>🟠 La prochaine étape (juin-juillet)</h4>
+            <ul>
+                <li>Contacter le PGIIS pour obtenir les cartes des zones inondables</li>
+                <li>Intégrer ces cartes dans l'application</li>
+                <li>Activer le système intelligent de détection (3h + confirmation)</li>
+                <li>Tester avec 5-10 communes avant de généraliser</li>
+            </ul>
+        </div>
+
+        <!-- Section 7: Timeline -->
+        <h2>7. 📅 Calendrier des prochaines semaines</h2>
+
+        <div class="steps">
+            <div class="step">
+                <span class="step-number">1</span>
+                <h4>Fin mai 2026</h4>
+                <p>Notifications en ligne et testées ✅<br>
+                Les citoyens peuvent recevoir les alertes par téléphone, email et SMS.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">2</span>
+                <h4>Juin 2026</h4>
+                <p>Cartes PGIIS reçues et intégrées<br>
+                La carte interactive affiche les zones inondables avec les bonnes couleurs.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">3</span>
+                <h4>Juillet 2026</h4>
+                <p>Système intelligent activé<br>
+                Quand il y a 2 alertes au même endroit, le système confirme l'inondation.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">4</span>
+                <h4>Fin juillet 2026</h4>
+                <p>Pilot national<br>
+                Test avec les maires et services d'urgence de 5-10 communes.</p>
+            </div>
+        </div>
+
+        <!-- Benefits summary -->
+        <h2>8. 🎯 Pourquoi tout ça ?</h2>
+
+        <h3>Pour les citoyens 👥</h3>
+        <ul>
+            <li>Savoir immédiatement quand il y a une inondation près de chez eux</li>
+            <li>Avoir le temps de se protéger et d'éviter la zone</li>
+            <li>Participer à l'alerte système en signalant</li>
+        </ul>
+
+        <h3>Pour les autorités 🏛️</h3>
+        <ul>
+            <li>Prendre des décisions basées sur des données fiables (pas de fausses alertes)</li>
+            <li>Réagir vite et coordonner les secours</li>
+            <li>Comprendre où et quand inondations arrivent</li>
+        </ul>
+
+        <h3>Pour la recherche 🎓</h3>
+        <ul>
+            <li>Avoir des données complètes des inondations</li>
+            <li>Analyser les patterns (zones critiques, saisons, causes)</li>
+            <li>Aider à la prévention et planification</li>
+        </ul>
+
+        <h3>Pour le Sénégal 🇸🇳</h3>
+        <ul>
+            <li>Réduire les pertes économiques des inondations</li>
+            <li>Sauver des vies</li>
+            <li>Avoir un système national de référence</li>
+        </ul>
+
+        <!-- FAQ -->
+        <h2 class="page-break">9. ❓ Questions fréquentes</h2>
+
+        <h3>Ça va coûter combien ?</h3>
+        <div class="box">
+            <p><strong>Rien pour commencer.</strong> Les notifications push (téléphone) sont gratuites. Les emails sont gratuits pour 3000/mois, et les SMS test sont gratuits aussi. Si on utilise beaucoup plus tard, ça coûtera quelques centimes par SMS.</p>
+        </div>
+
+        <h3>Est-ce que les données des gens sont protégées ?</h3>
+        <div class="box">
+            <p><strong>Oui.</strong> Toutes les données sont chiffrées et stockées de manière sécurisée. Les gens contrôlent totalement ce qu'ils partagent.</p>
+        </div>
+
+        <h3>Ça marche hors ligne ?</h3>
+        <div class="box">
+            <p><strong>Partiellement maintenant.</strong> La carte et les alertes récentes sont disponibles hors ligne. On améliorera ça pour avoir une expérience complète sans internet.</p>
+        </div>
+
+        <h3>Pourquoi il faut attendre 3 heures ?</h3>
+        <div class="box">
+            <p><strong>Pour être sûr.</strong> Une inondation dure généralement plusieurs heures. Si 2 personnes différentes signalent la même zone avant 3 heures, c'est une vraie inondation. Ça réduit les fausses alertes.</p>
+        </div>
+
+        <h3>On peut modifier ça après ?</h3>
+        <div class="box">
+            <p><strong>Absolument.</strong> Le système est flexible. Si 3h c'est trop, on peut changer à 1h ou 2h. On fera des tests avec les autorités pour trouver le bon équilibre.</p>
+        </div>
+
+        <!-- Conclusion -->
+        <h2>✅ Conclusion</h2>
+
+        <div class="box success">
+            <h3>En deux semaines, on a :</h3>
+            <ul>
+                <li>✅ Rendu l'application plus belle et facile à utiliser</li>
+                <li>✅ Créé un système pour alerter tout le monde automatiquement</li>
+                <li>✅ Préparé l'intégration des cartes PGIIS</li>
+                <li>✅ Conçu un système intelligent pour vérifier les vraies inondations</li>
+            </ul>
+            <h3 style="margin-top: 1.5rem;">Maintenant, on est prêt pour :</h3>
+            <ul>
+                <li>🚀 Tester le système en vraie grandeur</li>
+                <li>🗺️ Intégrer les données du PGIIS</li>
+                <li>🎯 Aider les autorités et citoyens du Sénégal</li>
+            </ul>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <p><strong>Saytu Mbeund — Système d'Alerte aux Inondations</strong></p>
+            <p>Rapport simplifié pour non-techniciens | Mai 2026</p>
+            <p>Pour questions ou commentaires: contactez l'équipe de développement</p>
+        </footer>
+    </div>
+</body>
+</html>

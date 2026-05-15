@@ -1,0 +1,45 @@
+# ─── .dockerignore pour Dockerfile.render ─────────────────────────────────────
+# Exclut les gros fichiers pour accélérer le build Docker et éviter l'envoi
+# inutile de modèles lourds dans le contexte de build.
+# ──────────────────────────────────────────────────────────────────────────────
+
+# Gros modèles PyTorch — déployés sur Hugging Face Spaces, pas sur Render
+flood_api/models/*.pth
+
+# Gros fichiers Random Forest non utilisés par le forecast service
+flood_api/models/random_forest_model.pkl
+flood_api/models/modele_inondation_rf.joblib
+
+# Notebooks Jupyter (inutiles en production)
+flood_api/**/*.ipynb
+*.ipynb
+
+# Caches Python
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/*.pyd
+
+# Données de développement
+flood_api/donnees/
+
+# Fichiers système macOS
+**/.DS_Store
+
+# Git
+.git/
+.gitignore
+
+# Frontend (déployé séparément)
+frontend/
+
+# Fichiers de doc
+docs/
+diagramme/
+README.md
+*.md
+
+# Tests
+test_*/
+*_test.py
+test_*.py

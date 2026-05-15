@@ -1,0 +1,75 @@
+@startuml
+!theme plain
+skinparam backgroundColor white
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam roundCorner 10
+skinparam linetype ortho
+
+' --- STYLES ---
+skinparam rectangle {
+    BorderThickness 1.5
+    Shadowing false
+}
+skinparam arrow {
+    Color #444444
+    Thickness 1.5
+}
+
+' --- 1. SOURCES (INPUTS) ---
+package "1. Acquisition de Données" as input_layer {
+    cloud "API Open-Meteo\n(Données Historiques)" as meteo_source #E6F2FF
+    actor "Citoyen\n(Smartphone)" as user #MistyrOsE
+}
+
+' --- 2. PRÉTRAITEMENT ---
+package "2. Prétraitement (ETL)" as prep_layer {
+    rectangle "Feature Engineering\n(Cumuls 3j, 7j, Humidité)" as feat_eng #E6F2FF
+    rectangle "Normalisation (Z-Score)\n& Resize (224x224)" as img_prep #MistyrOsE
+}
+
+' --- 3. INFÉRENCE IA (CŒUR) ---
+package "3. Moteurs d'Intelligence Artificielle" as ai_layer {
+    rectangle "<b>Modèle Random Forest</b>\n(Prédiction de Risque)" as rf_model #LightBlue {
+        label "Input: Vecteur Tabulaire"
+    }
+    
+    rectangle "<b>Modèle ConvNeXt-Tiny</b>\n(Détection Visuelle)" as cv_model #Pink {
+        label "Input: Tenseur Image"
+    }
+}
+
+' --- 4. INTÉGRATION ---
+package "4. Plateforme Collaborative" as platform_layer {
+    rectangle "<b>Agrégation & Synchronisation</b>\n(Firebase / API Gateway)" as aggregation #Honeydew
+}
+
+' --- 5. SORTIE ---
+rectangle "<b>TABLEAU DE BORD</b>\n(Aide à la Décision)" as dashboard #DarkSeaGreen
+rectangle "Base de Données\n(Historique Alertes)" as db #LightGray
+
+' --- RELATIONS ---
+
+' Flux Météo (Bleu)
+meteo_source -[#blue]-> feat_eng
+feat_eng -[#blue]-> rf_model
+rf_model -[#blue]-> aggregation : "Probabilité Risque\n(ex: 0.85)"
+
+' Flux Vision (Rouge)
+user -[#red]-> img_prep : "Photo + GPS"
+img_prep -[#red]-> cv_model
+cv_model -[#red]-> aggregation : "Classe (Inondé)\n+ Confiance (0.99)"
+
+' Flux Plateforme
+aggregation --> dashboard : "Affichage Temps Réel"
+aggregation --> db : "Stockage JSON"
+
+' Note explicative
+note right of dashboard
+  <b>Visualisation Consolidée :</b>
+  1. Alerte Citoyenne (Validée par ConvNeXt)
+  2. Contexte Météo (Calculé par RF)
+  3. Décision finale par l'autorité
+end note
+
+@enduml

@@ -1,0 +1,81 @@
+@startuml
+skinparam actorStyle awesome
+left to right direction
+
+' --- ACTEURS ---
+actor "Visiteur" as V
+actor "Citoyen" as C
+actor "Maire" as M
+actor "SuperAdministrateur" as SA
+entity "Open-Meteo API" as API <<System>>
+
+' --- HIERARCHIE DES ACTEURS ---
+V <|-- C
+C <|-- M
+C <|-- SA
+
+package "Système Innond" {
+    
+    ' --- Bloc Prédiction Automatique ---
+    usecase "Consulter la Prédiction Automatique" as UC_Pred
+    usecase "Récupérer & Analyser Données" as UC_Fetch
+    usecase "Calculer le Risque de Crue" as UC_Calcul
+    usecase "Générer Alerte Automatique" as UC_Gen_Alerte
+    
+    ' --- Bloc Signalement & IA ---
+    usecase "Signaler une Inondation" as UC_Signaler
+    usecase "Soumettre une Photo" as UC_Photo
+    usecase "Analyse IA & Validation Visuelle" as UC_IA
+    usecase "Géolocalisation" as UC_Geo
+    
+    ' --- Bloc Décision & Action ---
+    usecase "Valider Signalement / Alerte" as UC_Val
+    usecase "Affecter des Ressources / Equipes" as UC_Affect
+    usecase "Accéder au Tableau de Bord" as UC_TDB
+    
+    ' --- Bloc Consultation & Admin ---
+    usecase "Consulter Carte & Alertes" as UC_Infos
+    usecase "Se Connecter" as UC_Login
+    usecase "Gérer le Système (Comptes/Données)" as UC_Admin
+}
+
+' --- RELATIONS ACTEURS ---
+
+' Public (Visiteur)
+V -- UC_Pred
+V -- UC_Infos
+V -- UC_Login
+
+' Terrain (Citoyen)
+C -- UC_Signaler
+C -- UC_Photo
+
+' Autorités (Maire & Admin héritent du Citoyen)
+M -- UC_Val
+M -- UC_Affect
+M -- UC_TDB
+
+SA -- UC_Val
+SA -- UC_Affect
+SA -- UC_TDB
+SA -- UC_Admin
+
+' --- LOGIQUE INTERNE & DEPENDANCES ---
+
+' Flux Météo
+API --> UC_Fetch
+UC_Pred ..> UC_Fetch : <<include>>
+UC_Fetch ..> UC_Calcul : <<include>>
+UC_Calcul ..> UC_Gen_Alerte : <<include>>
+
+' Flux IA (La photo valide le signalement via l'IA)
+UC_Photo ..> UC_IA : <<include>>
+UC_Signaler ..> UC_Geo : <<include>>
+' L'IA est l'outil d'aide à la décision pour le validateur humain
+UC_IA ..> UC_Val : <<use>>
+
+' Flux Décisionnel
+UC_Affect ..> UC_Val : <<extend>>
+UC_Val ..> UC_Infos : <<update>>
+
+@enduml

@@ -1,5 +1,5 @@
 """
-FloodGuardAI — Classification Service (Hugging Face Spaces)
+Saytu Mbeund — Classification Service (Hugging Face Spaces)
 API Flask pour la détection d'inondation par image avec ConvNeXt-Tiny.
 """
 from __future__ import annotations

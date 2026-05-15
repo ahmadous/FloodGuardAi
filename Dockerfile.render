@@ -1,0 +1,47 @@
+# ─── Dockerfile.render ────────────────────────────────────────────────────────
+# Image optimisée pour Render.com (API gateway).
+# Le service de classification est géré séparément et appelé par le gateway.
+# ──────────────────────────────────────────────────────────────────────────────
+FROM python:3.11-slim
+
+# Dépendances système (GDAL pour geopandas, spatialindex pour rtree)
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        gdal-bin \
+        libgdal-dev \
+        libspatialindex-dev \
+        build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# ── Dépendances Python ──────────────────────────────────────────────────────
+# On installe uniquement le gateway.
+COPY flood_api/gateway/requirements.txt /tmp/gateway-req.txt
+
+RUN pip install --no-cache-dir \
+        gunicorn \
+        -r /tmp/gateway-req.txt
+
+# ── Code source ─────────────────────────────────────────────────────────────
+COPY flood_api/ /app/flood_api/
+
+# ── Données géographiques utilisées par le gateway ──────────────────────────
+COPY flood_api/models/geodata/                         /app/flood_api/models/geodata/
+COPY flood_api/models/dakar_shapefile/                 /app/flood_api/models/dakar_shapefile/
+COPY flood_api/models/kaolack_shapefile/               /app/flood_api/models/kaolack_shapefile/
+COPY flood_api/models/saintlouis_shapefile/            /app/flood_api/models/saintlouis_shapefile/
+COPY flood_api/models/geodata_manifest.json            /app/flood_api/models/
+
+# ── Variables d'environnement ────────────────────────────────────────────────
+ENV PYTHONPATH=/app
+ENV GDAL_DATA=/usr/share/gdal
+ENV CLASSIFICATION_SERVICE_URL=https://passeydou-floodguard-classification.hf.space
+
+# ── Script de démarrage ──────────────────────────────────────────────────────
+COPY flood_api/start_render.sh /app/start_render.sh
+RUN chmod +x /app/start_render.sh
+
+EXPOSE 10000
+
+CMD ["/app/start_render.sh"]
