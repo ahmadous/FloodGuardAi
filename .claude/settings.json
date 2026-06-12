@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(ls -lh /Users/mac/Documents/Innond/flood_api/models/*.pth /Users/mac/Documents/Innond/flood_api/models/*.joblib /Users/mac/Documents/Innond/flood_api/models/*.pkl)",
-      "Bash(cat /Users/mac/Documents/Innond/frontend/src/components/layout/*.vue)",
-      "Bash(npx pwa-assets-generator:*)"
-    ]
-  }
-}
