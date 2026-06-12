@@ -4,7 +4,7 @@
 .cursor/
 .copilot/
 .ai/
-
+./archive/
 # MacOS
 .DS_Store
 
